@@ -116,7 +116,7 @@ export class RecapRenderer {
         ${rank <= 3 ? this.getRankIcon(rank) : rank}
       </div>
       <img src="${avatarUrl}" alt="${contributor.userName}" class="contributor-avatar me-3"
-           onerror="this.src='https://static.wikia.nocookie.net/alter-ego/images/f/f7/Place.png'">
+           onerror="this.src='https://vignette.wikia.nocookie.net/messaging/images/1/19/Avatar.jpg'">
       <div class="contributor-info flex-grow-1 me-3">
         <h6 class="mb-1">
           ${contributor.userName}

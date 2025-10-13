@@ -221,7 +221,7 @@ export class RecapService {
 
       return avatarUrl;
     }
-    return "https://static.wikia.nocookie.net/alter-ego/images/f/f7/Place.png";
+    return "https://vignette.wikia.nocookie.net/messaging/images/1/19/Avatar.jpg";
   }
 
   static async getCurrentWeekDate(): Promise<string> {
