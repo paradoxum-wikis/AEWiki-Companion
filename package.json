@@ -9,10 +9,9 @@
     "format": "bunx prettier . --write"
   },
   "devDependencies": {
-    "@types/node": "^24.10.0",
-    "prettier": "^3.6.2",
+    "prettier": "^3.8.1",
     "typescript": "^5.9.3",
-    "vite": "^7.1.12"
+    "vite": "^7.3.1"
   },
   "dependencies": {
     "bootstrap": "^5.3.8",
