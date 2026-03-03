@@ -110,49 +110,54 @@ export class RecapService {
       const cached = localStorage.getItem(this.INDEX_CACHE_KEY);
       if (cached) {
         const { timestamp, files } = JSON.parse(cached);
-        const now = Date.now();
-
-        if (now - timestamp < this.INDEX_CACHE_DURATION) {
+        if (Date.now() - timestamp < this.INDEX_CACHE_DURATION) {
           console.log("Using cached available files index");
           return new Set(files);
         }
       }
 
       console.log("Fetching available files from GitHub API");
-      const response = await fetch(
+      const availableFiles = new Set<string>();
+
+      const rootResponse = await fetch(
         "https://api.github.com/repos/paradoxum-wikis/automation/contents/aew/recap/data",
       );
 
-      if (!response.ok) {
-        throw new Error(`Failed to fetch directory: ${response.status}`);
+      if (!rootResponse.ok) {
+        throw new Error(`Failed to fetch directory: ${rootResponse.status}`);
       }
 
-      const data = await response.json();
-      const availableFiles = new Set<string>();
+      const rootData = await rootResponse.json();
+      const yearFolders = rootData.filter((item: any) => item.type === "dir");
 
-      data.tree
-        .filter(
-          (item: any) =>
-            item.type === "blob" &&
-            item.path.startsWith("data/") &&
-            item.path.endsWith(".json") &&
-            item.path.includes("recap-"),
-        )
-        .forEach((item: any) => {
-          // get date from filename: data/2025/recap-2025-01-01.json -> 2025-01-01
-          const match = item.path.match(/recap-(\d{4}-\d{2}-\d{2})\.json$/);
-          if (match) {
-            availableFiles.add(match[1]);
-          }
-        });
+      await Promise.all(
+        yearFolders.map(async (folder: any) => {
+          const yearResponse = await fetch(folder.url);
+          if (!yearResponse.ok) return;
 
-      const cacheData = {
-        timestamp: Date.now(),
-        files: Array.from(availableFiles),
-      };
+          const yearData = await yearResponse.json();
+          yearData
+            .filter(
+              (item: any) =>
+                item.type === "file" && item.name.endsWith(".json"),
+            )
+            .forEach((item: any) => {
+              const match = item.name.match(/recap-(\d{4}-\d{2}-\d{2})\.json$/);
+              if (match) {
+                availableFiles.add(match[1]);
+              }
+            });
+        }),
+      );
 
       try {
-        localStorage.setItem(this.INDEX_CACHE_KEY, JSON.stringify(cacheData));
+        localStorage.setItem(
+          this.INDEX_CACHE_KEY,
+          JSON.stringify({
+            timestamp: Date.now(),
+            files: Array.from(availableFiles),
+          }),
+        );
         console.log(`Cached ${availableFiles.size} available files`);
       } catch (error) {
         console.warn("Failed to cache available files:", error);
