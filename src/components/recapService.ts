@@ -2,7 +2,7 @@ import { RecapData, DateInfo } from "../types.js";
 
 export class RecapService {
   private static readonly GITHUB_RAW_BASE =
-    "https://github.com/paradoxum-wikis/automation/tree/main/aew/recap/data";
+    "https://raw.githubusercontent.com/paradoxum-wikis/automation/main/aew/recap/data";
   private static readonly CACHE_KEY_PREFIX = "aewiki-recap-";
   private static readonly INDEX_CACHE_KEY = "aewiki-available-files";
   private static readonly INDEX_CACHE_DURATION = 1 * 24 * 60 * 60 * 1000; // 1 day
@@ -120,7 +120,7 @@ export class RecapService {
 
       console.log("Fetching available files from GitHub API");
       const response = await fetch(
-        "https://api.github.com/repos/Paradoxum-Wikis/AEWiki-Recap/git/trees/main?recursive=1",
+        "https://api.github.com/repos/paradoxum-wikis/automation/contents/aew/recap/data",
       );
 
       if (!response.ok) {
