@@ -9,7 +9,7 @@ The companion site for the ALTER EGO Wiki. Data for leaderboards is taken from [
 1. **Clone the repo**
 
    ```bash
-   git clone https://github.com/Paradoxum-Wikis/AEWiki-Companion.git
+   git clone https://github.com/paradoxum-wikis/AEWiki-Companion.git
    cd AEWiki-Companion
    ```
 
