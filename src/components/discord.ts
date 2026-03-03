@@ -22,6 +22,8 @@ interface DiscordWidgetData {
   presence_count: number;
 }
 
+import { escapeHtml } from "./utils.js";
+
 class DiscordWidget {
   private readonly guildId: string = "1362084781134708907";
   private readonly inviteLink: string = "https://discord.com/invite/yfZUQ3h4cf";
@@ -73,9 +75,9 @@ class DiscordWidget {
     this.widgetContainer.innerHTML = `
       <div class="discord-header">
         <div class="discord-icon"></div>
-        <h4 class="mb-0">${this.escapeHtml(data.name || "ALTER EGO Discord")}</h4>
+        <h4 class="mb-0">${escapeHtml(data.name || "ALTER EGO Discord")}</h4>
       </div>
-      
+
       <div class="discord-stats">
         <div class="discord-stat">
           <div class="discord-stat-number member">${totalMembers}</div>
@@ -86,12 +88,12 @@ class DiscordWidget {
           <div class="discord-stat-label">Online</div>
         </div>
       </div>
-      
+
       ${this.renderMembersList(data.members)}
-      
+
       <div class="text-center">
-        <a href="${this.inviteLink}" 
-           target="_blank" 
+        <a href="${this.inviteLink}"
+           target="_blank"
            class="discord-join-btn">
           <i class="bi bi-discord"></i>
           Join Discord Server
@@ -110,12 +112,12 @@ class DiscordWidget {
         <div class="discord-icon"></div>
         <h4 class="mb-0">ALTER EGO Discord</h4>
       </div>
-      
+
       <p class="mb-3 text-center">Join our Discord community to chat with other fans, get updates, participate in discussions, and help build the ultimate ALTER EGO resource!</p>
-      
+
       <div class="text-center">
-        <a href="${this.inviteLink}" 
-           target="_blank" 
+        <a href="${this.inviteLink}"
+           target="_blank"
            class="discord-join-btn">
           <i class="bi bi-discord"></i>
           Join Discord Server
@@ -143,7 +145,7 @@ class DiscordWidget {
         (member) => `
       <div class="discord-member">
         <div class="discord-member-status ${member.status}"></div>
-        ${this.escapeHtml(member.username)}
+        ${escapeHtml(member.username)}
       </div>
     `,
       )
@@ -160,12 +162,6 @@ class DiscordWidget {
         ${remainingText}
       </div>
     `;
-  }
-
-  private escapeHtml(text: string): string {
-    const div = document.createElement("div");
-    div.textContent = text;
-    return div.innerHTML;
   }
 }
 

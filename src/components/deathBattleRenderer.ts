@@ -1,5 +1,6 @@
 import { BattleStats, BattleRecord } from "../types.js";
 import { DeathBattleService } from "./deathBattleService.js";
+import { escapeHtml } from "./utils.js";
 
 export class DeathBattleRenderer {
   private casualLoadingElement: HTMLElement;
@@ -468,7 +469,7 @@ export class DeathBattleRenderer {
     </div>
     <div class="contributor-info flex-grow-1 me-3">
       <h6 class="mb-1 fw-bold">
-        ${this.escapeHtml(player.userTag)}
+        ${escapeHtml(player.userTag)}
       </h6>
       <small class="text-muted">
         <i class="bi bi-person me-1"></i>
@@ -488,7 +489,7 @@ export class DeathBattleRenderer {
         </span>
       </div>
       <div class="fw-bold ${weightedScoreColor}">${weightedScore} WS</div>
-      <small class="text-muted">${totalBattles} ${totalBattles === 1 ? 'battle' : 'battles'} (${winRate}% win rate)</small>
+      <small class="text-muted">${totalBattles} ${totalBattles === 1 ? "battle" : "battles"} (${winRate}% win rate)</small>
     </div>
   `;
 
@@ -518,9 +519,9 @@ export class DeathBattleRenderer {
       <div class="d-flex justify-content-between align-items-start mb-2">
         <div class="flex-grow-1">
           <h6 class="mb-1">
-            <span class="text-success fw-bold">${this.escapeHtml(record.winnerTag)}</span>
+            <span class="text-success fw-bold">${escapeHtml(record.winnerTag)}</span>
             <small class="text-muted mx-2">defeated</small>
-            <span class="text-danger">${this.escapeHtml(record.loserTag)}</span>
+            <span class="text-danger">${escapeHtml(record.loserTag)}</span>
           </h6>
           <small class="text-muted">
             <i class="bi bi-calendar3 me-1"></i>
@@ -586,11 +587,5 @@ export class DeathBattleRenderer {
       <p class="text-muted mb-0">${message}</p>
     `;
     container.appendChild(noDataElement);
-  }
-
-  private escapeHtml(text: string): string {
-    const div = document.createElement("div");
-    div.textContent = text;
-    return div.innerHTML;
   }
 }
