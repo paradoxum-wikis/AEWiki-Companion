@@ -4,6 +4,10 @@
 	import type { RecapData } from "../../types.js";
 	import "./recap.css";
 
+	import * as Chart from "$lib/components/ui/chart/index.js";
+	import { scaleBand } from "d3-scale";
+	import { BarChart } from "layerchart";
+
 	import {
 		CircleStar,
 		Trophy,
@@ -29,14 +33,14 @@
 	let errorMessage = $state<string | null>(null);
 
 	let totalContributions = $derived(
-		recapData?.contributors.reduce(
+		recapData?.contributors?.reduce(
 			(sum, c) => sum + Number(c.contributions),
 			0,
-		) || 0,
+		) ?? 0,
 	);
 
 	let averagePerUser = $derived(
-		recapData?.contributors.length
+		recapData?.contributors?.length
 			? Math.round(totalContributions / recapData.contributors.length)
 			: 0,
 	);
@@ -63,6 +67,13 @@
 	function getPaletteColor(index: number) {
 		return palette[index % palette.length];
 	}
+
+	const chartConfig = {
+		contributions: {
+			label: "Contributions",
+			color: "oklch(0.55 0.18 20)",
+		},
+	} satisfies Chart.ChartConfig;
 
 	function countUp(node: HTMLElement, target: string | number) {
 		const targetNum = Number(target);
@@ -92,14 +103,11 @@
 		loadRecapData();
 	}
 
-	function navigateWeek(days: number): void {
-		if (days < 0) {
-			currentDate = RecapService.subtractDays(
-				currentDate,
-				Math.abs(days),
-			);
+	async function navigateWeek(direction: "prev" | "next"): Promise<void> {
+		if (direction === "prev") {
+			currentDate = await RecapService.getPreviousDate(currentDate);
 		} else {
-			currentDate = RecapService.addDays(currentDate, days);
+			currentDate = await RecapService.getNextDate(currentDate);
 		}
 
 		RecapService.updateUrlWithDate(currentDate);
@@ -128,20 +136,36 @@
 		}
 	}
 
-	function updateNavigationButtons(): void {
-		const today = RecapService.formatDate(new Date());
-		const currentDateObj = new Date(currentDate + "T00:00:00");
-		const todayObj = new Date(today + "T00:00:00");
-
-		nextDisabled = currentDateObj >= todayObj;
-		prevDisabled = false;
+	async function updateNavigationButtons(): Promise<void> {
+		const dates = await RecapService.getAvailableDates();
+		if (dates.length > 0) {
+			const currentIndex = dates.indexOf(currentDate);
+			if (currentIndex === -1) {
+				const todayObj = new Date(
+					RecapService.formatDate(new Date()) + "T00:00:00",
+				);
+				const currentObj = new Date(currentDate + "T00:00:00");
+				nextDisabled = currentObj >= todayObj;
+				prevDisabled = false;
+			} else {
+				prevDisabled = currentIndex === 0;
+				nextDisabled = currentIndex === dates.length - 1;
+			}
+		} else {
+			const todayObj = new Date(
+				RecapService.formatDate(new Date()) + "T00:00:00",
+			);
+			const currentObj = new Date(currentDate + "T00:00:00");
+			nextDisabled = currentObj >= todayObj;
+			prevDisabled = false;
+		}
 	}
 
 	function handleKeydown(e: KeyboardEvent) {
 		if (e.key === "ArrowLeft" && !prevDisabled) {
-			navigateWeek(-7);
+			navigateWeek("prev");
 		} else if (e.key === "ArrowRight" && !nextDisabled) {
-			navigateWeek(7);
+			navigateWeek("next");
 		}
 	}
 
@@ -236,7 +260,7 @@
 				<button
 					class="nav-btn"
 					disabled={prevDisabled}
-					onclick={() => navigateWeek(-7)}
+					onclick={() => navigateWeek("prev")}
 					aria-label="Previous Week"
 				>
 					<ChevronLeft class="btn-icon" />
@@ -246,7 +270,7 @@
 				<button
 					class="nav-btn"
 					disabled={nextDisabled}
-					onclick={() => navigateWeek(7)}
+					onclick={() => navigateWeek("next")}
 					aria-label="Next Week"
 				>
 					<span class="hide-mobile">Next Week</span>
@@ -361,120 +385,156 @@
 								</p>
 							</div>
 						{:else if recapData}
-							{#each recapData.contributors as contributor, i}
-								<button
-									class="leaderboard-item text-left flex items-center gap-4 w-full cursor-pointer hover:bg-muted/50 transition-colors border-b border-border p-4 last:border-0"
-									onclick={() =>
-										window.open(
-											`https://alter-ego.fandom.com/wiki/User:${encodeURIComponent(contributor.userName)}`,
-											"_blank",
-										)}
-								>
-									<div
-										class="leaderboard-rank flex shrink-0 justify-center items-center w-10 {i <
-										3
-											? `rank-${i + 1}`
-											: ''} font-bold text-lg"
+							{#if recapData.isModern}
+								<div class="w-full p-4 h-100">
+									<Chart.Container
+										config={chartConfig}
+										class="w-full h-full"
 									>
-										{#if i === 0}
-											<Trophy class="text-yellow-400" />
-										{:else if i === 1}
-											<Award class="text-gray-400" />
-										{:else if i === 2}
-											<CircleStar
-												class="text-amber-600"
-											/>
-										{:else}
-											{i + 1}
-										{/if}
-									</div>
-
-									<img
-										src={RecapService.extractAvatarUrl(
-											contributor.avatar,
-										)}
-										alt={contributor.userName}
-										class="contributor-avatar shrink-0 h-12 w-12 rounded-full border border-border object-cover"
-										onerror={(e) => {
-											(
-												e.currentTarget as HTMLImageElement
-											).src =
-												"https://vignette.wikia.nocookie.net/messaging/images/1/19/Avatar.jpg";
-										}}
-									/>
-
-									<div
-										class="contributor-info flex-1 min-w-0"
+										<BarChart
+											data={recapData.contributors}
+											xScale={scaleBand().padding(0.25)}
+											x="userName"
+											axis="x"
+											seriesLayout="group"
+											tooltipContext={false}
+											series={[
+												{
+													key: "contributions",
+													label: chartConfig
+														.contributions.label,
+													color: chartConfig
+														.contributions.color,
+												},
+											]}
+										>
+											{#snippet tooltip()}
+												<Chart.Tooltip />
+											{/snippet}
+										</BarChart>
+									</Chart.Container>
+								</div>
+							{:else}
+								{#each recapData.contributors as contributor, i}
+									<button
+										class="leaderboard-item text-left flex items-center gap-4 w-full cursor-pointer hover:bg-muted/50 transition-colors border-b border-border p-4 last:border-0"
+										onclick={() =>
+											window.open(
+												`https://alter-ego.fandom.com/wiki/User:${encodeURIComponent(contributor.userName)}`,
+												"_blank",
+											)}
 									>
-										<h6
-											class="m-0 mb-1 text-foreground font-semibold truncate text-base"
-										>
-											{contributor.userName}
-											{#if contributor.isAdmin}
-												<span
-													class="admin-badge ml-2 px-2 py-0.5 text-[0.65rem] tracking-wider rounded font-bold bg-primary/10 text-primary"
-												>
-													Administrator
-												</span>
-											{/if}
-										</h6>
-										<small
-											class="text-muted-foreground flex items-center text-xs"
-										>
-											<UserIcon class="mr-1" size={12} />
-											User ID: {contributor.userId}
-										</small>
-									</div>
-
-									<div class="text-right shrink-0">
 										<div
-											class="contributions-count text-primary text-xl font-bold"
-											use:countUp={contributor.contributions}
+											class="leaderboard-rank flex shrink-0 justify-center items-center w-10 {i <
+											3
+												? `rank-${i + 1}`
+												: ''} font-bold text-lg"
 										>
-											0
+											{#if i === 0}
+												<Trophy
+													class="text-yellow-400"
+												/>
+											{:else if i === 1}
+												<Award class="text-gray-400" />
+											{:else if i === 2}
+												<CircleStar
+													class="text-amber-600"
+												/>
+											{:else}
+												{i + 1}
+											{/if}
 										</div>
-										<small
-											class="text-muted-foreground contributions-text text-xs"
+
+										<img
+											src={RecapService.extractAvatarUrl(
+												contributor.avatar,
+											)}
+											alt={contributor.userName}
+											class="contributor-avatar shrink-0 h-12 w-12 rounded-full border border-border object-cover"
+											onerror={(e) => {
+												(
+													e.currentTarget as HTMLImageElement
+												).src =
+													"https://vignette.wikia.nocookie.net/messaging/images/1/19/Avatar.jpg";
+											}}
+										/>
+
+										<div
+											class="contributor-info flex-1 min-w-0"
 										>
-											{contributor.contributionsText}
-										</small>
-									</div>
-								</button>
-							{/each}
+											<h6
+												class="m-0 mb-1 text-foreground font-semibold truncate text-base"
+											>
+												{contributor.userName}
+												{#if contributor.isAdmin}
+													<span
+														class="admin-badge ml-2 px-2 py-0.5 text-[0.65rem] tracking-wider rounded font-bold bg-primary/10 text-primary"
+													>
+														Administrator
+													</span>
+												{/if}
+											</h6>
+											<small
+												class="text-muted-foreground flex items-center text-xs"
+											>
+												<UserIcon
+													class="mr-1"
+													size={12}
+												/>
+												User ID: {contributor.userId}
+											</small>
+										</div>
+
+										<div class="text-right shrink-0">
+											<div
+												class="contributions-count text-primary text-xl font-bold"
+												use:countUp={contributor.contributions}
+											>
+												0
+											</div>
+											<small
+												class="text-muted-foreground contributions-text text-xs"
+											>
+												{contributor.contributionsText}
+											</small>
+										</div>
+									</button>
+								{/each}
+							{/if}
 						{/if}
 					</div>
 				</div>
-			</div>
 
-			{#if recapData && recapData.contributors.length > 0}
-				<div
-					class="mt-6 mb-4 flex h-6 w-full overflow-hidden rounded-md border border-border bg-muted"
-				>
-					{#each recapData.contributors as c, i}
-						<div
-							class="h-full transition-all duration-500 hover:opacity-80"
-							style="width: {(Number(c.contributions) /
-								totalContributions) *
-								100}%; background: {getPaletteColor(i)}"
-							title="{c.userName} ({c.contributions})"
-						></div>
-					{/each}
-				</div>
+				{#if recapData && recapData.contributors.length > 0}
+					<div
+						class="mt-6 mb-4 flex h-6 w-full overflow-hidden rounded-md border border-border bg-muted"
+					>
+						{#each recapData.contributors as c, i}
+							<div
+								class="h-full transition-all duration-500 hover:opacity-80"
+								style="width: {(Number(c.contributions) /
+									totalContributions) *
+									100}%; background: {getPaletteColor(i)}"
+								title="{c.userName} ({c.contributions})"
+							></div>
+						{/each}
+					</div>
 
-				<div class="mb-4 flex flex-wrap items-center gap-3 px-1">
-					{#each recapData.contributors as c, i}
-						<span
-							class="flex items-center text-sm text-muted-foreground font-medium"
-						>
+					<div class="mb-4 flex flex-wrap items-center gap-3 px-1">
+						{#each recapData.contributors as c, i}
 							<span
-								class="inline-block mr-2 h-3 w-3 rounded-sm shadow-sm"
-								style="background: {getPaletteColor(i)};"
-							></span>
-							{c.userName}
-						</span>
-					{/each}
-				</div>
-			{/if}
+								class="flex items-center text-sm text-muted-foreground font-medium"
+							>
+								<span
+									class="inline-block mr-2 h-3 w-3 rounded-sm shadow-sm"
+									style="background: {getPaletteColor(i)};"
+								></span>
+								{c.userName}
+							</span>
+						{/each}
+					</div>
+				{/if}
+			</div>
 		</section>
 	</main>
 </div>
@@ -485,7 +545,7 @@
 		z-index: 1;
 		max-width: 1200px;
 		margin: 0 auto;
-		padding: 3rem 1.5rem 4rem;
+		padding: 0 1.5rem 4rem;
 		animation: fadeUp 0.7s ease-out both;
 	}
 

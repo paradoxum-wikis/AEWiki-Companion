@@ -1,13 +1,20 @@
 import type { RecapData, DateInfo } from "../types.js";
 
 export class RecapService {
+	private static readonly GITHUB_API_BASE =
+		"https://api.github.com/repos/paradoxum-wikis/automation/contents/data/recap/aew";
 	private static readonly GITHUB_RAW_BASE =
-		"https://raw.githubusercontent.com/paradoxum-wikis/automation/main/data/recap/aew/legacy";
+		"https://raw.githubusercontent.com/paradoxum-wikis/automation/main/data/recap/aew";
+
 	private static readonly CACHE_KEY_PREFIX = "aewiki-recap-";
-	private static readonly INDEX_CACHE_KEY = "aewiki-available-files";
+	private static readonly INDEX_CACHE_KEY = "aewiki-available-files-v3";
 	private static readonly INDEX_CACHE_DURATION = 1 * 24 * 60 * 60 * 1000; // 1 day
 
 	private static availableFiles: Set<string> | null = null;
+
+	static isLegacyFormat(dateString: string): boolean {
+		return dateString <= "2026-04-12";
+	}
 
 	static formatDate(date: Date): string {
 		const year = date.getFullYear();
@@ -18,12 +25,7 @@ export class RecapService {
 
 	static parseDate(dateString: string): DateInfo {
 		const [year, month, day] = dateString.split("-").map(Number);
-		return {
-			year,
-			month,
-			day,
-			dateString,
-		};
+		return { year, month, day, dateString };
 	}
 
 	static formatDisplayDate(dateString: string): string {
@@ -53,27 +55,17 @@ export class RecapService {
 		try {
 			const cacheKey = this.getCacheKey(dateString);
 			const cached = localStorage.getItem(cacheKey);
-
-			if (!cached) {
-				return null;
-			}
-
-			const data = JSON.parse(cached);
-			console.log(`Using cached data for ${dateString}`);
-			return data;
+			if (!cached) return null;
+			return JSON.parse(cached);
 		} catch (error) {
-			console.warn("Error reading from cache:", error);
 			return null;
 		}
 	}
 
-	private static setCachedData(dateString: string, data: RecapData): void {
+	private static setCachedData(dateString: string, data: any): void {
 		try {
-			const cacheKey = this.getCacheKey(dateString);
-			localStorage.setItem(cacheKey, JSON.stringify(data));
-			console.log(`Cached data for ${dateString}`);
+			localStorage.setItem(this.getCacheKey(dateString), JSON.stringify(data));
 		} catch (error) {
-			console.warn("Error writing to cache:", error);
 			this.clearOldestEntries();
 		}
 	}
@@ -84,24 +76,18 @@ export class RecapService {
 			for (let i = 0; i < localStorage.length; i++) {
 				const key = localStorage.key(i);
 				if (key && key.startsWith(this.CACHE_KEY_PREFIX)) {
-					const dateString = key.replace(this.CACHE_KEY_PREFIX, "");
-					cacheEntries.push({ key, date: dateString });
+					cacheEntries.push({
+						key,
+						date: key.replace(this.CACHE_KEY_PREFIX, ""),
+					});
 				}
 			}
-
 			cacheEntries.sort((a, b) => a.date.localeCompare(b.date));
 			const entriesToRemove = Math.ceil(cacheEntries.length * 0.25);
-
 			for (let i = 0; i < entriesToRemove && i < cacheEntries.length; i++) {
 				localStorage.removeItem(cacheEntries[i].key);
 			}
-
-			console.log(
-				`Cleared ${entriesToRemove} oldest cache entries to free up space`,
-			);
-		} catch (error) {
-			console.warn("Error clearing old cache:", error);
-		}
+		} catch (error) {}
 	}
 
 	private static async fetchAvailableFiles(): Promise<Set<string>> {
@@ -110,44 +96,65 @@ export class RecapService {
 			if (cached) {
 				const { timestamp, files } = JSON.parse(cached);
 				if (Date.now() - timestamp < this.INDEX_CACHE_DURATION) {
-					console.log("Using cached available files index");
 					return new Set(files);
 				}
 			}
 
-			console.log("Fetching available files from GitHub API");
 			const availableFiles = new Set<string>();
-
-			const rootResponse = await fetch(
-				"https://api.github.com/repos/paradoxum-wikis/automation/contents/data/recap/aew/legacy",
-			);
-
-			if (!rootResponse.ok) {
-				throw new Error(`Failed to fetch directory: ${rootResponse.status}`);
-			}
-
+			const rootResponse = await fetch(this.GITHUB_API_BASE);
+			if (!rootResponse.ok)
+				throw new Error(`Failed to fetch root: ${rootResponse.status}`);
 			const rootData = await rootResponse.json();
-			const yearFolders = rootData.filter((item: any) => item.type === "dir");
 
+			const modernFolders = rootData.filter(
+				(i: any) =>
+					i.type === "dir" && i.name !== "legacy" && /^\d{4}$/.test(i.name),
+			);
 			await Promise.all(
-				yearFolders.map(async (folder: any) => {
-					const yearResponse = await fetch(folder.url);
-					if (!yearResponse.ok) return;
-
-					const yearData = await yearResponse.json();
-					yearData
-						.filter(
-							(item: any) =>
-								item.type === "file" && item.name.endsWith(".json"),
-						)
-						.forEach((item: any) => {
-							const match = item.name.match(/recap-(\d{4}-\d{2}-\d{2})\.json$/);
-							if (match) {
-								availableFiles.add(match[1]);
-							}
-						});
+				modernFolders.map(async (folder: any) => {
+					const res = await fetch(folder.url);
+					if (!res.ok) return;
+					const data = await res.json();
+					data.forEach((item: any) => {
+						const match = item.name.match(/^(\d{4}-\d{2}-\d{2})\.json$/);
+						if (match) availableFiles.add(match[1]);
+					});
 				}),
 			);
+
+			const legacyFolder = rootData.find((i: any) => i.name === "legacy");
+			if (legacyFolder) {
+				const legacyRes = await fetch(legacyFolder.url);
+				if (legacyRes.ok) {
+					const legacyData = await legacyRes.json();
+
+					legacyData.forEach((item: any) => {
+						if (item.type === "file") {
+							const match = item.name.match(
+								/^recap-(\d{4}-\d{2}-\d{2})\.json$/,
+							);
+							if (match) availableFiles.add(match[1]);
+						}
+					});
+
+					const legacyYearFolders = legacyData.filter(
+						(i: any) => i.type === "dir" && /^\d{4}$/.test(i.name),
+					);
+					await Promise.all(
+						legacyYearFolders.map(async (folder: any) => {
+							const res = await fetch(folder.url);
+							if (!res.ok) return;
+							const data = await res.json();
+							data.forEach((item: any) => {
+								const match = item.name.match(
+									/^recap-(\d{4}-\d{2}-\d{2})\.json$/,
+								);
+								if (match) availableFiles.add(match[1]);
+							});
+						}),
+					);
+				}
+			}
 
 			try {
 				localStorage.setItem(
@@ -157,14 +164,10 @@ export class RecapService {
 						files: Array.from(availableFiles),
 					}),
 				);
-				console.log(`Cached ${availableFiles.size} available files`);
-			} catch (error) {
-				console.warn("Failed to cache available files:", error);
-			}
+			} catch (e) {}
 
 			return availableFiles;
 		} catch (error) {
-			console.error("Error fetching available files:", error);
 			return new Set<string>();
 		}
 	}
@@ -175,55 +178,105 @@ export class RecapService {
 		}
 	}
 
-	private static async isFileAvailable(dateString: string): Promise<boolean> {
+	static async getAvailableDates(): Promise<string[]> {
 		await this.ensureAvailableFiles();
-		return this.availableFiles!.has(dateString);
+		return this.availableFiles ? Array.from(this.availableFiles).sort() : [];
 	}
 
-	static async fetchRecapData(dateString: string): Promise<RecapData> {
-		const cachedData = this.getCachedData(dateString);
-		if (cachedData) {
-			return cachedData;
-		}
+	static async getPreviousDate(currentDate: string): Promise<string> {
+		const dates = await this.getAvailableDates();
+		if (dates.length === 0) return this.subtractDays(currentDate, 7);
+		const prev = [...dates].reverse().find((d) => d < currentDate);
+		return prev || this.subtractDays(currentDate, 7);
+	}
 
-		const fileExists = await this.isFileAvailable(dateString);
-		if (!fileExists) {
-			throw new Error("No recap data available for this date.");
-		}
+	static async getNextDate(currentDate: string): Promise<string> {
+		const dates = await this.getAvailableDates();
+		if (dates.length === 0) return this.addDays(currentDate, 7);
+		const next = dates.find((d) => d > currentDate);
+		return next || this.addDays(currentDate, 7);
+	}
+
+	static async fetchRecapData(dateString: string): Promise<any> {
+		const cachedData = this.getCachedData(dateString);
+		if (cachedData) return cachedData;
 
 		const { year } = this.parseDate(dateString);
-		const filename = `recap-${dateString}.json`;
-		const url = `${this.GITHUB_RAW_BASE}/${year}/${filename}`;
+		const isLegacy = this.isLegacyFormat(dateString);
 
 		try {
-			console.log(`Fetching data for ${dateString} from API`);
-			const response = await fetch(url);
-			if (!response.ok) {
-				throw new Error(
-					`Failed to fetch data: ${response.status} ${response.statusText}`,
-				);
+			if (isLegacy) {
+				const filename = `recap-${dateString}.json`;
+				const yearUrl = `${this.GITHUB_RAW_BASE}/legacy/${year}/${filename}`;
+				const directUrl = `${this.GITHUB_RAW_BASE}/legacy/${filename}`;
+
+				let response = await fetch(yearUrl);
+				if (!response.ok) {
+					response = await fetch(directUrl);
+				}
+
+				if (!response.ok) throw new Error(`Failed to fetch legacy data`);
+				const data = await response.json();
+
+				this.setCachedData(dateString, data);
+				return data;
+			} else {
+				const summaryUrl = `${this.GITHUB_RAW_BASE}/${year}/${dateString}.json`;
+				const rawUrl = `${this.GITHUB_RAW_BASE}/${year}/${dateString}.raw.json`;
+
+				const [summaryRes, rawRes] = await Promise.all([
+					fetch(summaryUrl),
+					fetch(rawUrl),
+				]);
+				if (!summaryRes.ok || !rawRes.ok)
+					throw new Error("Failed to fetch modern recap data");
+
+				const summary = await summaryRes.json();
+				const rawData = await rawRes.json();
+
+				const contributors = Object.entries(summary.counts)
+					.map(([name, count]) => {
+						const userEvent = rawData.find(
+							(e: any) => e.embeds[0]?.author?.name === name,
+						);
+						const avatar = userEvent?.embeds[0]?.author?.iconURL || "";
+
+						return {
+							userName: name,
+							userId: "N/A",
+							avatar: avatar,
+							contributions: count as number,
+							contributionsText: "messages",
+							isAdmin: false,
+						};
+					})
+					.sort((a, b) => b.contributions - a.contributions);
+
+				const data = {
+					isModern: true,
+					totalContributors: contributors.length,
+					contributors: contributors,
+					rawData: rawData,
+				};
+
+				this.setCachedData(dateString, data);
+				return data;
 			}
-
-			const data: RecapData = await response.json();
-			this.setCachedData(dateString, data);
-
-			return data;
 		} catch (error) {
-			console.error("Error fetching recap data:", error);
 			throw error;
 		}
 	}
 
-	static extractAvatarUrl(avatarHtml: string): string {
-		const imgMatch = avatarHtml.match(/src="([^"]+)"/);
+	static extractAvatarUrl(avatarSource: string): string {
+		if (!avatarSource)
+			return "https://vignette.wikia.nocookie.net/messaging/images/1/19/Avatar.jpg";
+		if (avatarSource.startsWith("http")) return avatarSource;
+		const imgMatch = avatarSource.match(/src="([^"]+)"/);
 		if (imgMatch && imgMatch[1]) {
-			let avatarUrl = imgMatch[1];
-			avatarUrl = avatarUrl.replace(
+			return imgMatch[1].replace(
 				/width\/36\/height\/36/,
 				"width/128/height/128",
 			);
-
-			return avatarUrl;
 		}
 		return "https://vignette.wikia.nocookie.net/messaging/images/1/19/Avatar.jpg";
 	}
@@ -231,20 +284,13 @@ export class RecapService {
 	static async getCurrentWeekDate(): Promise<string> {
 		const urlParams = new URLSearchParams(window.location.search);
 		const dateParam = urlParams.get("date");
-
-		if (dateParam) {
-			const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-			if (dateRegex.test(dateParam)) {
-				return dateParam;
-			}
-		}
+		if (dateParam && /^\d{4}-\d{2}-\d{2}$/.test(dateParam)) return dateParam;
 
 		await this.ensureAvailableFiles();
 		if (this.availableFiles && this.availableFiles.size > 0) {
 			const sortedDates = Array.from(this.availableFiles).sort().reverse();
 			return sortedDates[0];
 		}
-
 		return this.formatDate(new Date());
 	}
 
