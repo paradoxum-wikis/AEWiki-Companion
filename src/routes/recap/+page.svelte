@@ -799,16 +799,13 @@
 									},
 									highlight: { points: { r: 3 } },
 									xAxis: {
-										ticks: analytics.hourChartData.filter(
-											(d) =>
-												[
-													"00h",
-													"06h",
-													"12h",
-													"18h",
-													"23h",
-												].includes(d.hour),
-										),
+										ticks: [
+											"00h",
+											"06h",
+											"12h",
+											"18h",
+											"23h",
+										],
 										format: (v: string) => v,
 									},
 								}}
@@ -824,7 +821,7 @@
 				<!-- Namespace breakdown -->
 				<Card.Root class="flex flex-col">
 					<Card.Header class="pb-2 items-center">
-						<Card.Title>Namespace Breakdown</Card.Title>
+						<Card.Title>Namespaces</Card.Title>
 					</Card.Header>
 					<Card.Content class="flex-1">
 						<Chart.Container
