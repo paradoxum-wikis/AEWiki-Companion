@@ -5,8 +5,11 @@
 	import "./recap.css";
 
 	import * as Chart from "$lib/components/ui/chart/index.js";
+	import * as Card from "$lib/components/ui/card/index.js";
 	import { scaleBand } from "d3-scale";
-	import { BarChart } from "layerchart";
+	import { BarChart, PieChart, Arc, Text, LineChart } from "layerchart";
+	import { curveNatural } from "d3-shape";
+	import { cubicInOut } from "svelte/easing";
 
 	import {
 		CircleStar,
@@ -24,10 +27,21 @@
 		ListOrdered,
 	} from "@lucide/svelte";
 
+	const timelineChartConfig = {
+		edits: { label: "Edits", color: "var(--chart-1)" },
+	} satisfies Chart.ChartConfig;
+
+	const hourChartConfig = {
+		edits: { label: "Edits", color: "var(--chart-2)" },
+	} satisfies Chart.ChartConfig;
+
+	const pageChartConfig = {
+		edits: { label: "Edits", color: "var(--chart-3)" },
+	} satisfies Chart.ChartConfig;
+
 	let currentDate = $state("");
 	let prevDisabled = $state(false);
 	let nextDisabled = $state(true);
-
 	let recapData = $state<RecapData | null>(null);
 	let loading = $state(true);
 	let errorMessage = $state<string | null>(null);
@@ -64,109 +78,244 @@
 		"#AA00FF",
 	];
 
-	function getPaletteColor(index: number) {
-		return palette[index % palette.length];
+	function getPaletteColor(i: number) {
+		return palette[i % palette.length];
 	}
 
-	const chartConfig = {
-		contributions: {
-			label: "Contributions",
-			color: "oklch(0.55 0.18 20)",
-		},
-	} satisfies Chart.ChartConfig;
-
 	function countUp(node: HTMLElement, target: string | number) {
-		const targetNum = Number(target);
-		if (isNaN(targetNum) || targetNum === 0) return;
-
-		let current = 0;
-		const increment = Math.max(1, Math.ceil(targetNum / 30));
-		const timer = setInterval(() => {
-			current += increment;
-			if (current >= targetNum) {
-				node.textContent = targetNum.toString();
-				clearInterval(timer);
-			} else {
-				node.textContent = current.toString();
-			}
+		const n = Number(target);
+		if (isNaN(n) || n === 0) return;
+		let cur = 0;
+		const inc = Math.max(1, Math.ceil(n / 30));
+		const t = setInterval(() => {
+			cur += inc;
+			if (cur >= n) {
+				node.textContent = n.toString();
+				clearInterval(t);
+			} else node.textContent = cur.toString();
 		}, 20);
-
 		return {
 			destroy() {
-				clearInterval(timer);
+				clearInterval(t);
 			},
 		};
 	}
+
+	const KNOWN_NS = [
+		"MediaWiki",
+		"User",
+		"File",
+		"Template",
+		"Category",
+		"Help",
+		"Talk",
+		"Template talk",
+		"User talk",
+		"Module",
+	];
+
+	const analytics = $derived.by(() => {
+		if (!recapData?.rawData?.length) return null;
+		const raw = recapData.rawData as any[];
+
+		const hourCounts = Array(24).fill(0);
+		const isoDateCounts: Record<string, number> = {};
+		const nsCounts: Record<string, number> = {};
+		const pageCounts: Record<string, number> = {};
+		let totalAdded = 0,
+			totalRemoved = 0;
+		let typeEdit = 0,
+			typeNew = 0,
+			typeUpload = 0,
+			typeRemoval = 0;
+
+		for (const entry of raw) {
+			const d = new Date(entry.timestamp);
+			hourCounts[d.getHours()]++;
+
+			const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+			isoDateCounts[iso] = (isoDateCounts[iso] || 0) + 1;
+
+			const embed = entry.embeds?.[0];
+			if (!embed) continue;
+			const title: string = embed.title || "";
+
+			// Edit type
+			const isBlank =
+				embed.description === "Blanked the page" ||
+				(embed.fields || []).some((f: any) => f.value === "Blanking");
+			if (title.startsWith("Uploaded")) typeUpload++;
+			else if (title.includes("(N!)")) typeNew++;
+			else if (isBlank) typeRemoval++;
+			else typeEdit++;
+
+			// Namespace
+			let ns = "Main";
+			if (title.startsWith("Uploaded")) {
+				ns = "File";
+			} else {
+				const colon = title.indexOf(":");
+				if (colon > 0) {
+					const candidate = title.substring(0, colon);
+					if (KNOWN_NS.includes(candidate)) ns = candidate;
+				}
+			}
+			nsCounts[ns] = (nsCounts[ns] || 0) + 1;
+
+			// Page name
+			const cleanTitle = title
+				.replace(/^Uploaded (?:a new version of )?/, "")
+				.replace(/\s*\(\s*(?:\(N!\)\s+)?[+-]?\d+\s*\)\s*$/, "")
+				.trim();
+			if (cleanTitle)
+				pageCounts[cleanTitle] = (pageCounts[cleanTitle] || 0) + 1;
+
+			// Byte
+			const m = title.match(/\(\s*(?:\(N!\)\s+)?([+-]?\d+)\s*\)\s*$/);
+			if (m) {
+				const n = parseInt(m[1]);
+				if (!isNaN(n)) {
+					if (n > 0) totalAdded += n;
+					else if (n < 0) totalRemoved += Math.abs(n);
+				}
+			}
+		}
+
+		// Chart data
+		const timelineData = Object.entries(isoDateCounts)
+			.sort(([a], [b]) => a.localeCompare(b))
+			.map(([iso, edits]) => ({
+				day: new Date(iso + "T12:00:00").toLocaleDateString("en-US", {
+					month: "short",
+					day: "numeric",
+				}),
+				edits,
+			}));
+
+		const hourChartData = hourCounts.map((edits, i) => ({
+			hour: `${i.toString().padStart(2, "0")}h`,
+			edits,
+		}));
+
+		const nsEntries = Object.entries(nsCounts).sort((a, b) => b[1] - a[1]);
+		const nsChartData = nsEntries.map(([ns, count], i) => ({
+			ns,
+			count,
+			color: `var(--chart-${(i % 5) + 1})`,
+		}));
+		const nsChartConfig = {
+			count: { label: "Edits" },
+			...Object.fromEntries(
+				nsEntries.map(([ns], i) => [
+					ns,
+					{ label: ns, color: `var(--chart-${(i % 5) + 1})` },
+				]),
+			),
+		} as Chart.ChartConfig;
+
+		const editTypeData = [
+			{ type: "Edit", count: typeEdit, color: "var(--chart-1)" },
+			{ type: "New Page", count: typeNew, color: "var(--chart-2)" },
+			{ type: "Upload", count: typeUpload, color: "var(--chart-3)" },
+			{ type: "Removal", count: typeRemoval, color: "var(--chart-4)" },
+		].filter((d) => d.count > 0);
+		const editTypeConfig = {
+			count: { label: "Count" },
+			...Object.fromEntries(
+				editTypeData.map((d) => [
+					d.type,
+					{ label: d.type, color: d.color },
+				]),
+			),
+		} as Chart.ChartConfig;
+
+		const topPagesRaw = Object.entries(pageCounts)
+			.sort((a, b) => b[1] - a[1])
+			.slice(0, 8);
+		const pageChartData = topPagesRaw.map(([page, edits]) => ({
+			page: (page.includes(":")
+				? page.split(":").slice(1).join(":")
+				: page
+			)
+				.replace(/\s*\(.*\)$/, "")
+				.trim()
+				.slice(0, 22),
+			fullPage: page,
+			edits,
+		}));
+
+		return {
+			timelineData,
+			hourChartData,
+			nsChartData,
+			nsChartConfig,
+			editTypeData,
+			editTypeConfig,
+			pageChartData,
+			totalAdded,
+			totalRemoved,
+			netChange: totalAdded - totalRemoved,
+			total: raw.length,
+		};
+	});
 
 	async function init() {
 		currentDate = await RecapService.getCurrentWeekDate();
 		loadRecapData();
 	}
 
-	async function navigateWeek(direction: "prev" | "next"): Promise<void> {
-		if (direction === "prev") {
-			currentDate = await RecapService.getPreviousDate(currentDate);
-		} else {
-			currentDate = await RecapService.getNextDate(currentDate);
-		}
-
+	async function navigateWeek(direction: "prev" | "next") {
+		currentDate =
+			direction === "prev"
+				? await RecapService.getPreviousDate(currentDate)
+				: await RecapService.getNextDate(currentDate);
 		RecapService.updateUrlWithDate(currentDate);
 		loadRecapData();
 	}
 
-	async function loadRecapData(): Promise<void> {
+	async function loadRecapData() {
 		loading = true;
 		errorMessage = null;
 		updateNavigationButtons();
-
 		try {
 			recapData = await RecapService.fetchRecapData(currentDate);
 		} catch (error) {
-			console.error("Failed to load recap data:", error);
-			if (error instanceof Error) {
-				errorMessage = error.message.includes("404")
-					? "No recap data available for this date."
-					: error.message;
-			} else {
-				errorMessage = "Failed to load recap data.";
-			}
+			errorMessage =
+				error instanceof Error
+					? error.message.includes("404")
+						? "No recap data available for this date."
+						: error.message
+					: "Failed to load recap data.";
 			recapData = null;
 		} finally {
 			loading = false;
 		}
 	}
 
-	async function updateNavigationButtons(): Promise<void> {
+	async function updateNavigationButtons() {
 		const dates = await RecapService.getAvailableDates();
 		if (dates.length > 0) {
-			const currentIndex = dates.indexOf(currentDate);
-			if (currentIndex === -1) {
-				const todayObj = new Date(
-					RecapService.formatDate(new Date()) + "T00:00:00",
-				);
-				const currentObj = new Date(currentDate + "T00:00:00");
-				nextDisabled = currentObj >= todayObj;
+			const idx = dates.indexOf(currentDate);
+			if (idx === -1) {
+				nextDisabled =
+					new Date(currentDate + "T00:00:00") >=
+					new Date(RecapService.formatDate(new Date()) + "T00:00:00");
 				prevDisabled = false;
 			} else {
-				prevDisabled = currentIndex === 0;
-				nextDisabled = currentIndex === dates.length - 1;
+				prevDisabled = idx === 0;
+				nextDisabled = idx === dates.length - 1;
 			}
 		} else {
-			const todayObj = new Date(
-				RecapService.formatDate(new Date()) + "T00:00:00",
-			);
-			const currentObj = new Date(currentDate + "T00:00:00");
-			nextDisabled = currentObj >= todayObj;
+			nextDisabled =
+				new Date(currentDate + "T00:00:00") >=
+				new Date(RecapService.formatDate(new Date()) + "T00:00:00");
 			prevDisabled = false;
 		}
 	}
 
 	function handleKeydown(e: KeyboardEvent) {
-		if (e.key === "ArrowLeft" && !prevDisabled) {
-			navigateWeek("prev");
-		} else if (e.key === "ArrowRight" && !nextDisabled) {
-			navigateWeek("next");
-		}
+		if (e.key === "ArrowLeft" && !prevDisabled) navigateWeek("prev");
+		if (e.key === "ArrowRight" && !nextDisabled) navigateWeek("next");
 	}
 
 	async function handlePopstate() {
@@ -178,7 +327,6 @@
 		init();
 		window.addEventListener("popstate", handlePopstate);
 		document.addEventListener("keydown", handleKeydown);
-
 		return () => {
 			window.removeEventListener("popstate", handlePopstate);
 			document.removeEventListener("keydown", handleKeydown);
@@ -190,7 +338,7 @@
 	<title>Weekly Recap | Paradoxum Wikis Companio</title>
 	<meta
 		name="description"
-		content="Weekly contributor leaderboard for the ALTER EGO Wiki. Track top contributors and their weekly contributions."
+		content="Weekly contributor leaderboard for the ALTER EGO Wiki."
 	/>
 	<meta
 		name="keywords"
@@ -204,33 +352,20 @@
 	/>
 	<meta
 		property="og:description"
-		content="Weekly contributor leaderboard for the ALTER EGO Wiki. Track top contributors and their weekly contributions."
+		content="Weekly contributor leaderboard for the ALTER EGO Wiki."
 	/>
 	<meta property="og:image" content="https://ae.tds-editor.com/banner.png" />
 	<meta property="og:image:width" content="1200" />
 	<meta property="og:image:height" content="630" />
-	<meta
-		property="og:image:alt"
-		content="ALTER EGO Wiki Weekly Recap - Track top contributors"
-	/>
 	<meta property="og:site_name" content="Paradoxum Wikis Companio" />
 	<meta property="og:locale" content="en_US" />
 	<meta name="twitter:card" content="summary_large_image" />
 	<meta name="twitter:site" content="@isALTEREGOout" />
-	<meta name="twitter:creator" content="@isALTEREGOout" />
 	<meta
 		name="twitter:title"
 		content="Weekly Recap | Paradoxum Wikis Companio"
 	/>
-	<meta
-		name="twitter:description"
-		content="Weekly contributor leaderboard for the ALTER EGO Wiki. Track top contributors and their weekly contributions."
-	/>
 	<meta name="twitter:image" content="https://ae.tds-editor.com/banner.png" />
-	<meta
-		name="twitter:image:alt"
-		content="ALTER EGO Wiki Weekly Recap - Track top contributors"
-	/>
 	<meta name="theme-color" content="#900c3f" />
 	<meta name="apple-mobile-web-app-title" content="AEWiki Companion" />
 	<meta name="apple-mobile-web-app-capable" content="yes" />
@@ -250,12 +385,12 @@
 	</div>
 
 	<main>
+		<!-- Header -->
 		<div class="recap-header">
 			<h1 class="header-title">
 				<Trophy class="title-icon" />
 				Weekly Contributor Leaderboard
 			</h1>
-
 			<div class="nav-controls">
 				<button
 					class="nav-btn"
@@ -280,14 +415,13 @@
 			</div>
 		</div>
 
-		<div class="nav-hint text-center">
-			<small>
-				You can use <kbd>←</kbd> and <kbd>→</kbd> to navigate weeks
-			</small>
+		<div class="nav-hint">
+			<small>Use <kbd>←</kbd> and <kbd>→</kbd> to navigate weeks</small>
 		</div>
 
+		<!-- Top stat cards -->
 		<section class="cards-section">
-			<div class="cards-grid stats-grid">
+			<div class="cards-grid">
 				<div class="card card-recap">
 					<div class="card-accent-bar"></div>
 					<div class="card-icon-row">
@@ -302,7 +436,6 @@
 						</p>
 					</div>
 				</div>
-
 				<div class="card card-deathbattle">
 					<div class="card-accent-bar"></div>
 					<div class="card-icon-row">
@@ -315,7 +448,6 @@
 						</p>
 					</div>
 				</div>
-
 				<div class="card card-resources">
 					<div class="card-accent-bar"></div>
 					<div class="card-icon-row">
@@ -328,7 +460,6 @@
 						</p>
 					</div>
 				</div>
-
 				<div class="card card-wiki">
 					<div class="card-accent-bar"></div>
 					<div class="card-icon-row">
@@ -346,6 +477,7 @@
 
 		<div class="section-divider"></div>
 
+		<!-- Leaderboard -->
 		<section class="leaderboard-section">
 			<div class="card card-featured">
 				<div class="card-accent-bar"></div>
@@ -385,95 +517,86 @@
 								</p>
 							</div>
 						{:else if recapData}
-							{#if recapData.isModern}
-								<div class="w-full p-4 h-100">
-									<Chart.Container
-										config={chartConfig}
-										class="w-full h-full"
+							{#each recapData.contributors as contributor, i}
+								{@const avatarUrl =
+									RecapService.extractAvatarUrl(
+										contributor.avatar,
+									)}
+								{@const hasAvatar =
+									contributor.avatar?.startsWith("http")}
+								<button
+									class="leaderboard-item text-left flex items-center gap-4 w-full cursor-pointer hover:bg-muted/50 transition-colors border-b border-border p-4 last:border-0"
+									onclick={() =>
+										window.open(
+											`https://alter-ego.fandom.com/wiki/User:${encodeURIComponent(contributor.userName)}`,
+											"_blank",
+										)}
+								>
+									<div
+										class="leaderboard-rank flex shrink-0 justify-center items-center w-10 {i <
+										3
+											? `rank-${i + 1}`
+											: ''} font-bold text-lg"
 									>
-										<BarChart
-											data={recapData.contributors}
-											xScale={scaleBand().padding(0.25)}
-											x="userName"
-											axis="x"
-											seriesLayout="group"
-											tooltipContext={false}
-											series={[
-												{
-													key: "contributions",
-													label: chartConfig
-														.contributions.label,
-													color: chartConfig
-														.contributions.color,
-												},
-											]}
-										>
-											{#snippet tooltip()}
-												<Chart.Tooltip />
-											{/snippet}
-										</BarChart>
-									</Chart.Container>
-								</div>
-							{:else}
-								{#each recapData.contributors as contributor, i}
-									<button
-										class="leaderboard-item text-left flex items-center gap-4 w-full cursor-pointer hover:bg-muted/50 transition-colors border-b border-border p-4 last:border-0"
-										onclick={() =>
-											window.open(
-												`https://alter-ego.fandom.com/wiki/User:${encodeURIComponent(contributor.userName)}`,
-												"_blank",
-											)}
-									>
-										<div
-											class="leaderboard-rank flex shrink-0 justify-center items-center w-10 {i <
-											3
-												? `rank-${i + 1}`
-												: ''} font-bold text-lg"
-										>
-											{#if i === 0}
-												<Trophy
-													class="text-yellow-400"
-												/>
-											{:else if i === 1}
-												<Award class="text-gray-400" />
-											{:else if i === 2}
-												<CircleStar
-													class="text-amber-600"
-												/>
-											{:else}
-												{i + 1}
-											{/if}
-										</div>
+										{#if i === 0}<Trophy
+												class="text-yellow-400"
+											/>
+										{:else if i === 1}<Award
+												class="text-gray-400"
+											/>
+										{:else if i === 2}<CircleStar
+												class="text-amber-600"
+											/>
+										{:else}{i + 1}{/if}
+									</div>
 
+									{#if hasAvatar}
 										<img
-											src={RecapService.extractAvatarUrl(
-												contributor.avatar,
-											)}
+											src={avatarUrl}
 											alt={contributor.userName}
 											class="contributor-avatar shrink-0 h-12 w-12 rounded-full border border-border object-cover"
 											onerror={(e) => {
+												const el =
+													e.currentTarget as HTMLImageElement;
+												el.style.display = "none";
 												(
-													e.currentTarget as HTMLImageElement
-												).src =
-													"https://vignette.wikia.nocookie.net/messaging/images/1/19/Avatar.jpg";
+													el.nextElementSibling as HTMLElement
+												).style.display = "flex";
 											}}
 										/>
-
 										<div
-											class="contributor-info flex-1 min-w-0"
+											class="contributor-avatar shrink-0 h-12 w-12 rounded-full border border-border items-center justify-center text-lg font-bold text-muted-foreground bg-muted"
+											style="display:none"
 										>
-											<h6
-												class="m-0 mb-1 text-foreground font-semibold truncate text-base"
-											>
-												{contributor.userName}
-												{#if contributor.isAdmin}
-													<span
-														class="admin-badge ml-2 px-2 py-0.5 text-[0.65rem] tracking-wider rounded font-bold bg-primary/10 text-primary"
-													>
-														Administrator
-													</span>
-												{/if}
-											</h6>
+											{contributor.userName
+												.charAt(0)
+												.toUpperCase()}
+										</div>
+									{:else}
+										<div
+											class="contributor-avatar shrink-0 h-12 w-12 rounded-full border border-border flex items-center justify-center text-lg font-bold text-muted-foreground bg-muted"
+										>
+											{contributor.userName
+												.charAt(0)
+												.toUpperCase()}
+										</div>
+									{/if}
+
+									<div
+										class="contributor-info flex-1 min-w-0"
+									>
+										<h6
+											class="m-0 mb-1 text-foreground font-semibold truncate text-base"
+										>
+											{contributor.userName}
+											{#if contributor.isAdmin}
+												<span
+													class="admin-badge ml-2 px-2 py-0.5 text-[0.65rem] tracking-wider rounded font-bold bg-primary/10 text-primary"
+													>Administrator</span
+												>
+											{/if}
+										</h6>
+										{#if contributor.userId && contributor.userId !== "N/A"}
 											<small
 												class="text-muted-foreground flex items-center text-xs"
 											>
@@ -483,63 +606,382 @@
 												/>
 												User ID: {contributor.userId}
 											</small>
-										</div>
+										{/if}
+									</div>
 
-										<div class="text-right shrink-0">
-											<div
-												class="contributions-count text-primary text-xl font-bold"
-												use:countUp={contributor.contributions}
-											>
-												0
-											</div>
-											<small
-												class="text-muted-foreground contributions-text text-xs"
-											>
-												{contributor.contributionsText}
-											</small>
+									<div class="text-right shrink-0">
+										<div
+											class="contributions-count text-primary text-xl font-bold"
+											use:countUp={contributor.contributions}
+										>
+											0
 										</div>
-									</button>
-								{/each}
-							{/if}
+										<small
+											class="text-muted-foreground contributions-text text-xs"
+											>{contributor.contributionsText}</small
+										>
+									</div>
+								</button>
+							{/each}
 						{/if}
 					</div>
 				</div>
-
-				{#if recapData && recapData.contributors.length > 0}
-					<div
-						class="mt-6 mb-4 flex h-6 w-full overflow-hidden rounded-md border border-border bg-muted"
-					>
-						{#each recapData.contributors as c, i}
-							<div
-								class="h-full transition-all duration-500 hover:opacity-80"
-								style="width: {(Number(c.contributions) /
-									totalContributions) *
-									100}%; background: {getPaletteColor(i)}"
-								title="{c.userName} ({c.contributions})"
-							></div>
-						{/each}
-					</div>
-
-					<div class="mb-4 flex flex-wrap items-center gap-3 px-1">
-						{#each recapData.contributors as c, i}
+			</div>
+			{#if recapData && recapData.contributors.length > 0}
+				<div
+					class="mt-6 mb-4 flex h-6 w-full overflow-hidden rounded-md border border-border bg-muted"
+				>
+					{#each recapData.contributors as c, i}
+						<div
+							class="h-full transition-all duration-500 hover:opacity-80"
+							style="width:{(Number(c.contributions) /
+								totalContributions) *
+								100}%;background:{getPaletteColor(i)}"
+							title="{c.userName} ({c.contributions})"
+						></div>
+					{/each}
+				</div>
+				<div class="mb-4 flex flex-wrap items-center gap-3 px-1">
+					{#each recapData.contributors as c, i}
+						<span
+							class="flex items-center text-sm text-muted-foreground font-medium"
+						>
 							<span
-								class="flex items-center text-sm text-muted-foreground font-medium"
+								class="inline-block mr-2 h-3 w-3 rounded-sm"
+								style="background:{getPaletteColor(i)};"
+							></span>
+							{c.userName}
+						</span>
+					{/each}
+				</div>
+			{/if}
+		</section>
+
+		<!-- Analytics -->
+		{#if analytics}
+			<div class="section-divider"></div>
+
+			<!-- Byte change -->
+			<div class="analytics-summary">
+				<div class="summary-stat">
+					<span class="summary-val">{analytics.total}</span>
+					<span class="summary-label">total edits</span>
+				</div>
+				<div class="summary-stat summary-stat-add">
+					<span class="summary-val"
+						>+{analytics.totalAdded.toLocaleString()}</span
+					>
+					<span class="summary-label">bytes added</span>
+				</div>
+				<div class="summary-stat summary-stat-rem">
+					<span class="summary-val"
+						>−{analytics.totalRemoved.toLocaleString()}</span
+					>
+					<span class="summary-label">bytes removed</span>
+				</div>
+				<div
+					class="summary-stat"
+					class:summary-stat-add={analytics.netChange > 0}
+					class:summary-stat-rem={analytics.netChange < 0}
+				>
+					<span class="summary-val">
+						{analytics.netChange >= 0
+							? "+"
+							: ""}{analytics.netChange.toLocaleString()}
+					</span>
+					<span class="summary-label">net change</span>
+				</div>
+			</div>
+
+			<!-- Edits per day -->
+			<Card.Root class="mb-4">
+				<Card.Header class="pb-2">
+					<Card.Title>Edits per Day</Card.Title>
+					<Card.Description
+						>Edit activity across this week</Card.Description
+					>
+				</Card.Header>
+				<Card.Content>
+					<Chart.Container
+						config={timelineChartConfig}
+						class="h-48 w-full"
+					>
+						<LineChart
+							data={analytics.timelineData}
+							x="day"
+							xScale={scaleBand()}
+							axis="x"
+							series={[
+								{
+									key: "edits",
+									label: "Edits",
+									color: timelineChartConfig.edits.color,
+								},
+							]}
+							props={{
+								spline: {
+									curve: curveNatural,
+									strokeWidth: 2,
+									motion: "tween",
+								},
+								highlight: { points: { r: 4 } },
+								xAxis: { format: (v: string) => v },
+							}}
+						>
+							{#snippet tooltip()}
+								<Chart.Tooltip />
+							{/snippet}
+						</LineChart>
+					</Chart.Container>
+				</Card.Content>
+			</Card.Root>
+
+			<div class="analytics-grid">
+				<!-- Edits by hour -->
+				<Card.Root>
+					<Card.Header class="pb-2">
+						<Card.Title>Edits by Hour</Card.Title>
+						<Card.Description
+							>When edits happen during the day</Card.Description
+						>
+					</Card.Header>
+					<Card.Content>
+						<Chart.Container
+							config={hourChartConfig}
+							class="h-44 w-full"
+						>
+							<LineChart
+								data={analytics.hourChartData}
+								x="hour"
+								xScale={scaleBand()}
+								axis="x"
+								series={[
+									{
+										key: "edits",
+										label: "Edits",
+										color: hourChartConfig.edits.color,
+									},
+								]}
+								props={{
+									spline: {
+										curve: curveNatural,
+										strokeWidth: 2,
+										motion: "tween",
+									},
+									highlight: { points: { r: 3 } },
+									xAxis: {
+										ticks: analytics.hourChartData.filter(
+											(d) =>
+												[
+													"00h",
+													"06h",
+													"12h",
+													"18h",
+													"23h",
+												].includes(d.hour),
+										),
+										format: (v: string) => v,
+									},
+								}}
+							>
+								{#snippet tooltip()}
+									<Chart.Tooltip />
+								{/snippet}
+							</LineChart>
+						</Chart.Container>
+					</Card.Content>
+				</Card.Root>
+
+				<!-- Namespace breakdown -->
+				<Card.Root class="flex flex-col">
+					<Card.Header class="pb-2 items-center">
+						<Card.Title>Namespace Breakdown</Card.Title>
+						<Card.Description
+							>Where edits are concentrated</Card.Description
+						>
+					</Card.Header>
+					<Card.Content class="flex-1">
+						<Chart.Container
+							config={analytics.nsChartConfig}
+							class="mx-auto aspect-square max-h-44"
+						>
+							<PieChart
+								data={analytics.nsChartData}
+								key="ns"
+								value="count"
+								cRange={analytics.nsChartData.map(
+									(d) => d.color,
+								)}
+								c="color"
+								props={{ pie: { motion: "tween" } }}
+							>
+								{#snippet tooltip()}
+									<Chart.Tooltip hideLabel />
+								{/snippet}
+								{#snippet arc({ props, visibleData, index })}
+									<Arc {...props}>
+										{#snippet children({ getArcTextProps })}
+											{#if visibleData[index].count / analytics.total > 0.08}
+												<Text
+													value={visibleData[index]
+														.ns}
+													{...getArcTextProps(
+														"centroid",
+													)}
+													font-size="11"
+													class="fill-background"
+												/>
+											{/if}
+										{/snippet}
+									</Arc>
+								{/snippet}
+							</PieChart>
+						</Chart.Container>
+					</Card.Content>
+					<Card.Footer class="flex-wrap gap-2 justify-center">
+						{#each analytics.nsChartData as d}
+							<span
+								class="flex items-center gap-1 text-xs text-muted-foreground"
 							>
 								<span
-									class="inline-block mr-2 h-3 w-3 rounded-sm shadow-sm"
-									style="background: {getPaletteColor(i)};"
+									class="inline-block h-2.5 w-2.5 rounded-sm"
+									style="background:{d.color}"
 								></span>
-								{c.userName}
+								{d.ns}
+								<span class="font-semibold text-foreground"
+									>{d.count}</span
+								>
 							</span>
 						{/each}
-					</div>
-				{/if}
+					</Card.Footer>
+				</Card.Root>
 			</div>
-		</section>
+
+			<div class="analytics-grid mt-4">
+				<!-- Edit type breakdown -->
+				<Card.Root class="flex flex-col">
+					<Card.Header class="pb-2 items-center">
+						<Card.Title>Edit Types</Card.Title>
+						<Card.Description
+							>Regular edits, new pages, uploads, removals</Card.Description
+						>
+					</Card.Header>
+					<Card.Content class="flex-1">
+						<Chart.Container
+							config={analytics.editTypeConfig}
+							class="mx-auto aspect-square max-h-44"
+						>
+							<PieChart
+								data={analytics.editTypeData}
+								key="type"
+								value="count"
+								cRange={analytics.editTypeData.map(
+									(d) => d.color,
+								)}
+								c="color"
+								props={{ pie: { motion: "tween" } }}
+							>
+								{#snippet tooltip()}
+									<Chart.Tooltip hideLabel />
+								{/snippet}
+								{#snippet arc({ props, visibleData, index })}
+									<Arc {...props}>
+										{#snippet children({ getArcTextProps })}
+											{#if visibleData[index].count / analytics.total > 0.08}
+												<Text
+													value={visibleData[index]
+														.type}
+													{...getArcTextProps(
+														"centroid",
+													)}
+													font-size="11"
+													class="fill-background"
+												/>
+											{/if}
+										{/snippet}
+									</Arc>
+								{/snippet}
+							</PieChart>
+						</Chart.Container>
+					</Card.Content>
+					<Card.Footer class="flex-wrap gap-2 justify-center">
+						{#each analytics.editTypeData as d}
+							<span
+								class="flex items-center gap-1 text-xs text-muted-foreground"
+							>
+								<span
+									class="inline-block h-2.5 w-2.5 rounded-sm"
+									style="background:{d.color}"
+								></span>
+								{d.type}
+								<span class="font-semibold text-foreground"
+									>{d.count}</span
+								>
+							</span>
+						{/each}
+					</Card.Footer>
+				</Card.Root>
+
+				<!-- Top edited pages -->
+				<Card.Root>
+					<Card.Header class="pb-2">
+						<Card.Title>Top Edited Pages</Card.Title>
+						<Card.Description
+							>Most frequently touched pages this week</Card.Description
+						>
+					</Card.Header>
+					<Card.Content>
+						<Chart.Container
+							config={pageChartConfig}
+							class="h-44 w-full"
+						>
+							<BarChart
+								data={analytics.pageChartData}
+								xScale={scaleBand().padding(0.25)}
+								x="page"
+								axis="x"
+								series={[
+									{
+										key: "edits",
+										label: "Edits",
+										color: pageChartConfig.edits.color,
+									},
+								]}
+								props={{
+									bars: {
+										stroke: "none",
+										rounded: "top",
+										motion: {
+											type: "tween",
+											duration: 400,
+											easing: cubicInOut,
+										},
+									},
+									xAxis: {
+										format: (v: string) => v,
+										tickLabelProps: {
+											svgProps: {
+												fontSize: 9,
+												textAnchor: "end",
+											},
+											rotate: -35,
+										},
+									},
+								}}
+							>
+								{#snippet tooltip()}
+									<Chart.Tooltip />
+								{/snippet}
+							</BarChart>
+						</Chart.Container>
+					</Card.Content>
+				</Card.Root>
+			</div>
+		{/if}
 	</main>
 </div>
 
-<style lang="scss">
+<style>
 	main {
 		position: relative;
 		z-index: 1;
@@ -575,7 +1017,6 @@
 	.title-icon {
 		color: var(--primary);
 	}
-
 	.nav-controls {
 		display: flex;
 		gap: 0.5rem;
@@ -599,10 +1040,8 @@
 			opacity: 0.5;
 			cursor: not-allowed;
 		}
-
 		&:not(:disabled):hover {
 			background: var(--muted);
-			border-color: var(--border);
 		}
 	}
 
@@ -610,7 +1049,6 @@
 		width: 16px;
 		height: 16px;
 	}
-
 	.show-mobile {
 		display: none;
 	}
@@ -790,6 +1228,53 @@
 		}
 	}
 
+	.analytics-summary {
+		display: flex;
+		gap: 1rem;
+		margin-bottom: 1rem;
+		flex-wrap: wrap;
+	}
+
+	.summary-stat {
+		flex: 1;
+		min-width: 110px;
+		background: var(--card);
+		border: 1px solid var(--border);
+		border-radius: 10px;
+		padding: 0.9rem 1.1rem;
+		display: flex;
+		flex-direction: column;
+		gap: 0.2rem;
+
+		&.summary-stat-add .summary-val {
+			color: oklch(0.62 0.18 145);
+		}
+		&.summary-stat-rem .summary-val {
+			color: oklch(0.58 0.18 20);
+		}
+	}
+
+	.summary-val {
+		font-size: 1.3rem;
+		font-weight: 800;
+		color: var(--foreground);
+		font-family: var(--font-heading);
+		line-height: 1.1;
+	}
+
+	.summary-label {
+		font-size: 0.68rem;
+		color: var(--muted-foreground);
+		text-transform: uppercase;
+		letter-spacing: 0.1em;
+	}
+
+	.analytics-grid {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 1rem;
+	}
+
 	@media (max-width: 900px) {
 		.cards-grid {
 			grid-template-columns: repeat(2, 1fr);
@@ -801,6 +1286,12 @@
 			flex-direction: column;
 			align-items: flex-start;
 			gap: 1rem;
+		}
+		.analytics-grid {
+			grid-template-columns: 1fr;
+		}
+		.analytics-summary {
+			gap: 0.5rem;
 		}
 	}
 
