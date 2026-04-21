@@ -56,7 +56,7 @@ export class RecapService {
 	}
 
 	private static getIndexCacheKey(wiki: WikiMode): string {
-		return `${wiki}-available-files-v3`;
+		return `${wiki}-available-files-v4`;
 	}
 
 	private static getCachedData(
@@ -273,7 +273,7 @@ export class RecapService {
 							userId: "N/A",
 							avatar: avatar,
 							contributions: count as number,
-							contributionsText: "messages",
+							contributionsText: "contributions",
 							isAdmin: false,
 						};
 					})
