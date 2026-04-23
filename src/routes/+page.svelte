@@ -102,7 +102,6 @@
 						<div class="card-icon">
 							<Trophy />
 						</div>
-						<div class="card-badge">Featured</div>
 					</div>
 					<div class="card-body">
 						<h2 class="card-title">Weekly Recap</h2>
@@ -183,7 +182,7 @@
 						<div class="card-icon">
 							<Book />
 						</div>
-						<div class="card-badge card-badge-info">Fandom</div>
+						<div class="card-badge">Fandom</div>
 					</div>
 					<div class="card-body">
 						<h2 class="card-title">ALTER EGO Wiki</h2>
@@ -211,7 +210,7 @@
 						<div class="card-icon">
 							<Book />
 						</div>
-						<div class="card-badge card-badge-info">Fandom</div>
+						<div class="card-badge">Fandom</div>
 					</div>
 					<div class="card-body">
 						<h2 class="card-title">Tower Defense Simulator</h2>
@@ -239,7 +238,7 @@
 						<div class="card-icon">
 							<MessageCircle />
 						</div>
-						<div class="card-badge card-badge-info">X</div>
+						<div class="card-badge">X</div>
 					</div>
 					<div class="card-body">
 						<h2 class="card-title">Fan Page</h2>
@@ -673,11 +672,6 @@
 		text-transform: uppercase;
 		padding: 0.2rem 0.5rem;
 		border-radius: 4px;
-		background: oklch(from var(--card-accent) l c h / 0.12);
-		color: var(--card-accent);
-	}
-
-	.card-badge-info {
 		background: var(--muted);
 		color: var(--muted-foreground);
 	}
