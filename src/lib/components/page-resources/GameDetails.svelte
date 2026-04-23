@@ -31,7 +31,7 @@
 	);
 	const description = $derived(
 		gameData?.gameDetails.description ||
-			"Load the selected game to inspect its current description, creator info, and raw resource metadata.",
+			"Load the selected game to inspect its current metadata.",
 	);
 
 	const developerLink = $derived(
@@ -311,10 +311,7 @@
 				{/each}
 			</div>
 		{:else}
-			<div class="empty-state">
-				Load game data to reveal the universe stats, attributes, creator
-				details, and technical values here.
-			</div>
+			<div class="empty-state">Cmon... load something...</div>
 		{/if}
 	</Card.Content>
 </Card.Root>

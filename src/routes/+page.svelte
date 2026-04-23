@@ -88,7 +88,7 @@
 
 		<!-- Main grid -->
 		<section class="cards-section">
-			<div class="section-label">Tools & Resources</div>
+			<div class="section-label">Balderdash</div>
 
 			<div class="cards-grid">
 				<!-- Weekly Recap -->

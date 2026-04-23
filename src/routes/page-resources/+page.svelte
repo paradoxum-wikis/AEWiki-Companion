@@ -211,7 +211,7 @@
 	<title>Page Resources | Paradoxum Wikis Companio</title>
 	<meta
 		name="description"
-		content="Browse cached game details, icons, and thumbnails for Tower Defense Simulator and ALTER EGO."
+		content="Browse game page details such as icons and thumbnails for ALTER EGO and Tower Defense Simulator."
 	/>
 </svelte:head>
 
@@ -275,7 +275,7 @@
 								<Award />
 							</div>
 							<div>
-								<Card.Title>Badges Information</Card.Title>
+								<Card.Title>Badges</Card.Title>
 								<Card.Description>
 									Badge player counts now live on the wiki
 									itself.
@@ -285,14 +285,13 @@
 					</Card.Header>
 					<Card.Content>
 						<p class="info-copy">
-							The badge list has been moved to the
-							<a
+							Go <a
 								href="https://tds.fandom.com/wiki/Badges"
 								target="_blank"
 								rel="noopener noreferrer"
 							>
-								Badges article
-							</a>.
+								here
+							</a> instead!
 						</p>
 					</Card.Content>
 				</Card.Root>
@@ -306,10 +305,9 @@
 						</div>
 						<div>
 							<Card.Title>Settings</Card.Title>
-							<Card.Description>
-								Clear locally cached data and downloaded image
-								blobs.
-							</Card.Description>
+							<Card.Description
+								><i>"Megidolaon..!"</i></Card.Description
+							>
 						</div>
 					</div>
 				</Card.Header>
