@@ -1,6 +1,6 @@
 import type { BattleStats, BattleRecord } from "../types.js";
 import { DeathBattleService } from "./deathBattleService.js";
-import { escapeHtml } from "./utils.ts";
+import { escapeHtml } from "./utils.js";
 
 export class DeathBattleRenderer {
 	private casualLoadingElement: HTMLElement;
