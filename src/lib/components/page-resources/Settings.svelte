@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { Trash2 } from "@lucide/svelte";
 	import { Button } from "$lib/components/ui/button/index.js";
-	import { clearCache } from "../../modules/cacheManage.js";
-	import { clearImageCache } from "../../modules/imageCache.js";
+	import { clearCache } from "../../../modules/cacheManage.js";
+	import { clearImageCache } from "../../../modules/imageCache.js";
 
 	let { onClearCache }: { onClearCache: () => void } = $props();
 

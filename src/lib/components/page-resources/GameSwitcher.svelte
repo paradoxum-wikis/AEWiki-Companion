@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Bird, Gamepad2 } from "@lucide/svelte";
 	import * as Card from "$lib/components/ui/card/index.js";
-	import type { GameType } from "../../modules/types.js";
+	import type { GameType } from "../../../modules/types.js";
 
 	let {
 		currentGame,

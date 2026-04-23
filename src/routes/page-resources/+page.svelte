@@ -11,12 +11,12 @@
 	import { getFromCache, saveToCache } from "../../modules/cacheManage.js";
 	import { getCachedImageUrl } from "../../modules/imageCache.js";
 	import type { GameDataCache, GameType } from "../../modules/types.js";
-	import GameSwitcher from "../../components/page-resources/GameSwitcher.svelte";
-	import Gallery from "../../components/page-resources/Gallery.svelte";
-	import GameDetails from "../../components/page-resources/GameDetails.svelte";
-	import HeroSection from "../../components/page-resources/HeroSection.svelte";
-	import LoadingButton from "../../components/page-resources/LoadingButton.svelte";
-	import Settings from "../../components/page-resources/Settings.svelte";
+	import GameSwitcher from "$lib/components/page-resources/GameSwitcher.svelte";
+	import Gallery from "$lib/components/page-resources/Gallery.svelte";
+	import GameDetails from "$lib/components/page-resources/GameDetails.svelte";
+	import HeroSection from "$lib/components/page-resources/HeroSection.svelte";
+	import LoadingButton from "$lib/components/page-resources/LoadingButton.svelte";
+	import Settings from "$lib/components/page-resources/Settings.svelte";
 
 	let currentGame = $state<GameType>("TDS");
 	let loading = $state(false);

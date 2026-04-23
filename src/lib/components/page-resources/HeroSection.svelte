@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Sparkles } from "@lucide/svelte";
-	import type { GameType } from "../../modules/types.js";
+	import type { GameType } from "../../../modules/types.js";
 
 	let { currentGame }: { currentGame: GameType } = $props();
 
@@ -48,29 +48,12 @@
 		margin-top: 1.5rem;
 		padding: clamp(1.5rem, 3vw, 2rem);
 		min-height: 14rem;
-		border: 1px solid color-mix(in oklab, var(--border) 88%, transparent);
 		border-radius: 1.5rem;
 		background-position: center;
 		background-size: cover;
 		position: relative;
 		overflow: hidden;
 		box-shadow: 0 24px 70px rgb(0 0 0 / 0.2);
-	}
-
-	.hero-section::after {
-		content: "";
-		position: absolute;
-		inset: auto -10% -35% auto;
-		width: 18rem;
-		height: 18rem;
-		border-radius: 999px;
-		background: radial-gradient(
-			circle,
-			color-mix(in oklab, var(--primary) 42%, transparent),
-			transparent 72%
-		);
-		opacity: 0.8;
-		pointer-events: none;
 	}
 
 	.hero-copy {
@@ -99,6 +82,7 @@
 		line-height: 1.05;
 		font-family: var(--font-heading);
 		color: white;
+		font-weight: bold;
 	}
 
 	p {

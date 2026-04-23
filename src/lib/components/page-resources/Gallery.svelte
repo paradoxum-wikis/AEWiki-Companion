@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Download, Image, Images, Info } from "@lucide/svelte";
 	import * as Card from "$lib/components/ui/card/index.js";
-	import { downloadImage } from "../../modules/downloader.js";
+	import { downloadImage } from "../../../modules/downloader.js";
 
 	let {
 		gameIconUrl,

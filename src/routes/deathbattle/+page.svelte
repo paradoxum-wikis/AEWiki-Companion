@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { DeathBattleRenderer } from '../../components/deathBattleRenderer.js';
-  import { DeathBattleService } from '../../components/deathBattleService.js';
+  import { DeathBattleRenderer } from "$lib/deathBattleRenderer.js";
+  import { DeathBattleService } from "$lib/deathBattleService.js";
   import '../../styles/recap.css';
   import '../../styles/deathbattle.css';
 

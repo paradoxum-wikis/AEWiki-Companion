@@ -9,7 +9,7 @@
 		ArrowRight,
 		ExternalLink,
 	} from "@lucide/svelte";
-	import DiscordWidget from "../components/Discord.svelte";
+	import DiscordWidget from "$lib/components/Discord.svelte";
 </script>
 
 <svelte:head>

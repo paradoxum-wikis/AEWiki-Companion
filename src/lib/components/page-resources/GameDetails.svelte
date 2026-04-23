@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { ChevronDown, ExternalLink, Info } from "@lucide/svelte";
 	import * as Card from "$lib/components/ui/card/index.js";
-	import type { GameDataCache } from "../../modules/types.js";
+	import type { GameDataCache } from "../../../modules/types.js";
 	import {
 		formatArray,
 		formatBoolean,
 		formatDate,
 		formatNumber,
-	} from "../../modules/formatter.js";
+	} from "../../../modules/formatter.js";
 
 	type DetailRow = {
 		label: string;
