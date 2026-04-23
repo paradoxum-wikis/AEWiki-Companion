@@ -59,14 +59,8 @@
 		content="black-translucent"
 	/>
 	<link rel="canonical" href="https://ae.tds-editor.com/" />
-	<link
-		rel="apple-touch-icon"
-		href="https://static.wikia.nocookie.net/alter-ego/images/4/4a/Site-favicon.ico"
-	/>
-	<link
-		rel="icon"
-		href="https://static.wikia.nocookie.net/alter-ego/images/4/4a/Site-favicon.ico"
-	/>
+	<link rel="apple-touch-icon" href="favicon.png" />
+	<link rel="icon" href="favicon.png" />
 </svelte:head>
 
 <div class="page-root">

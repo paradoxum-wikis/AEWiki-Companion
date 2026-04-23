@@ -18,7 +18,7 @@
 			href="/"
 		>
 			<img
-				src="https://static.wikia.nocookie.net/alter-ego/images/4/4a/Site-favicon.ico"
+				src="favicon.png"
 				alt="ALTER EGO Wiki"
 				class="w-6 h-6 hidden md:block"
 			/>
