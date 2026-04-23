@@ -659,7 +659,6 @@
 		font-size: 0.65rem;
 		font-weight: 700;
 		letter-spacing: 0.1em;
-		text-transform: uppercase;
 		padding: 0.2rem 0.5rem;
 		border-radius: 4px;
 		background: var(--muted);
