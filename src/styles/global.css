@@ -101,3 +101,34 @@
 		transform: translateY(0);
 	}
 }
+
+.tds-icon-well {
+	width: 2.5rem;
+	height: 2.5rem;
+	border-radius: 0.85rem;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+}
+
+.tds-icon-well--muted {
+	background: var(--muted);
+	color: var(--foreground);
+}
+
+.tds-icon-well--accent {
+	background: color-mix(in oklab, var(--primary) 12%, transparent);
+	color: var(--primary);
+}
+
+.tds-inline-title {
+	display: flex;
+	gap: 0.85rem;
+	min-width: 0;
+	align-items: flex-start;
+}
+
+.tds-inline-title--center {
+	align-items: center;
+}
