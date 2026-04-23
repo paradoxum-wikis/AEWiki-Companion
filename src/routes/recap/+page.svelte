@@ -990,8 +990,8 @@
 										format: (v: string) => v,
 										tickLabelProps: {
 											svgProps: {
-												fontSize: 9,
-												textAnchor: "end",
+												"font-size": 9,
+												"text-anchor": "end",
 											},
 											rotate: -35,
 										},
