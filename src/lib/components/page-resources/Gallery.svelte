@@ -86,7 +86,7 @@
 			</button>
 
 			<p class="asset-note">
-				<Info class="mt-0.5 size-3.5 shrink-0" />
+				<Info class="mt-1 size-3.5 shrink-0" />
 				The download tries the larger 1024px image first, then falls back
 				to the source icon if needed.
 			</p>
@@ -133,7 +133,7 @@
 
 			{#if showPlaceholders}
 				<p class="asset-note placeholder-note">
-					<Info class="mt-0.5 size-3.5 shrink-0" />
+					<Info class="mt-1 size-3.5 shrink-0" />
 					Showing placeholders for now. Load the selected game to fetch
 					the real thumbnails.
 				</p>
