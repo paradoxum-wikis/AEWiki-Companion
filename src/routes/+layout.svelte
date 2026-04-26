@@ -10,6 +10,12 @@
 
 <ModeWatcher />
 
+<svelte:head>
+	<link rel="apple-touch-icon" href="/favicon.png" />
+	<link rel="icon" type="image/png" href="/favicon.png" />
+	<meta name="theme-color" content="#900c3f" />
+</svelte:head>
+
 <nav class="w-full bg-primary text-white shadow-md sticky top-0 z-50">
 	<div class="container mx-auto flex items-center justify-between py-2 px-4">
 		<a
@@ -17,7 +23,7 @@
 			href="/"
 		>
 			<img
-				src="favicon.png"
+				src="/favicon.png"
 				alt="ALTER EGO Wiki"
 				class="w-6 h-6 hidden md:block"
 			/>

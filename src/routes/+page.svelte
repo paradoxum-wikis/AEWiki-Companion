@@ -59,8 +59,6 @@
 		content="black-translucent"
 	/>
 	<link rel="canonical" href="https://ae.tds-editor.com/" />
-	<link rel="apple-touch-icon" href="favicon.png" />
-	<link rel="icon" href="favicon.png" />
 </svelte:head>
 
 <div class="page-root">
