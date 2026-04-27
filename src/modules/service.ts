@@ -55,7 +55,7 @@ export class RobloxApiService {
     const gameIconApiUrl = `https://thumbnails.roblox.com/v1/places/gameicons?placeIds=${placeId}&size=512x512&format=Png&isCircular=false`;
     const proxyUrl = `${this.PROXY_BASE}${encodeURIComponent(gameIconApiUrl)}`;
 
-    const response = await fetch(proxyUrl);
+    const response = await fetch(proxyUrl, { credentials: "omit" });
     if (!response.ok) {
       throw new Error(`Failed to fetch game icon: ${response.status}`);
     }
@@ -82,7 +82,7 @@ export class RobloxApiService {
     const proxyUrl = `${this.PROXY_BASE}${encodeURIComponent(targetUrl)}`;
 
     try {
-      const response = await fetch(proxyUrl);
+      const response = await fetch(proxyUrl, { credentials: "omit" });
       if (!response.ok) return null;
 
       const result: RobloxAssetDeliveryResponse = await response.json();

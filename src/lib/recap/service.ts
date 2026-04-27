@@ -105,7 +105,9 @@ export class RecapService {
 			const proxiedUsersUrl = `${this.proxyBase}${encodeURIComponent(usersUrl)}`;
 
 			try {
-				const usersResponse = await fetch(proxiedUsersUrl);
+				const usersResponse = await fetch(proxiedUsersUrl, {
+					credentials: "omit",
+				});
 				if (!usersResponse.ok) continue;
 				const usersData = await usersResponse.json();
 				const users = usersData?.query?.users;
@@ -126,7 +128,9 @@ export class RecapService {
 
 				const detailsUrl = `${baseUrl}/wikia.php?controller=UserApi&method=getDetails&ids=${ids.join(",")}&format=json`;
 				const proxiedDetailsUrl = `${this.proxyBase}${encodeURIComponent(detailsUrl)}`;
-				const detailsResponse = await fetch(proxiedDetailsUrl);
+				const detailsResponse = await fetch(proxiedDetailsUrl, {
+					credentials: "omit",
+				});
 				if (!detailsResponse.ok) continue;
 				const detailsData = await detailsResponse.json();
 				const items = detailsData?.items;
