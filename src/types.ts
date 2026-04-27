@@ -14,7 +14,7 @@ export interface Contributor {
 export interface RecapData {
 	totalContributors: number;
 	contributors: Contributor[];
-	isModern?: boolean;
+	isNeo?: boolean;
 	rawData?: any[];
 }
 

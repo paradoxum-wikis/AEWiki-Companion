@@ -6,6 +6,7 @@ export class RecapService {
 	static readonly fallbackAvatar =
 		"https://vignette.wikia.nocookie.net/messaging/images/1/19/Avatar.jpg";
 	private static readonly proxyBase = "https://api.tds-editor.com/?url=";
+	private static readonly neoUserCacheKey = "recap-neo-users-v1";
 
 	private static availableFiles: Record<WikiMode, Set<string> | null> = {
 		aew: null,
@@ -63,17 +64,43 @@ export class RecapService {
 		return `${wiki}-available-files-v5`;
 	}
 
-	private static async fetchModernUsersByNames(
+	private static async fetchNeoUsersByNames(
 		userNames: string[],
 	): Promise<Map<string, { userId: string; avatar: string }>> {
 		if (userNames.length === 0) return new Map();
 
 		const baseUrl = "https://alter-ego.fandom.com";
 		const usersByName = new Map<string, { userId: string; avatar: string }>();
+		const usersToFetch: string[] = [];
 		const chunkSize = 50;
+		const oneWeekMs = 7 * 24 * 60 * 60 * 1000;
+		const now = Date.now();
+		let cache: Record<
+			string,
+			{ userId: string; avatar: string; cachedAt: number }
+		> = {};
 
-		for (let i = 0; i < userNames.length; i += chunkSize) {
-			const batch = userNames.slice(i, i + chunkSize);
+		try {
+			const raw = localStorage.getItem(this.neoUserCacheKey);
+			if (raw) cache = JSON.parse(raw);
+		} catch (error) {
+			cache = {};
+		}
+
+		for (const name of userNames) {
+			const cached = cache[name];
+			if (cached && now - cached.cachedAt < oneWeekMs) {
+				usersByName.set(name, {
+					userId: cached.userId,
+					avatar: cached.avatar,
+				});
+			} else {
+				usersToFetch.push(name);
+			}
+		}
+
+		for (let i = 0; i < usersToFetch.length; i += chunkSize) {
+			const batch = usersToFetch.slice(i, i + chunkSize);
 			const detailsUrl = `${baseUrl}/api/v1/User/Details?ids=${encodeURIComponent(batch.join(","))}`;
 			const proxiedDetailsUrl = `${this.proxyBase}${detailsUrl}`;
 
@@ -90,6 +117,11 @@ export class RecapService {
 						typeof item?.user_id === "number" &&
 						typeof item?.avatar === "string"
 					) {
+						cache[item.name] = {
+							userId: String(item.user_id),
+							avatar: item.avatar,
+							cachedAt: now,
+						};
 						usersByName.set(item.name, {
 							userId: String(item.user_id),
 							avatar: item.avatar,
@@ -100,6 +132,10 @@ export class RecapService {
 				continue;
 			}
 		}
+
+		try {
+			localStorage.setItem(this.neoUserCacheKey, JSON.stringify(cache));
+		} catch (error) {}
 
 		return usersByName;
 	}
@@ -171,12 +207,12 @@ export class RecapService {
 				throw new Error(`Failed to fetch root: ${rootResponse.status}`);
 			const rootData = await rootResponse.json();
 
-			const modernFolders = rootData.filter(
+			const neoFolders = rootData.filter(
 				(i: any) =>
 					i.type === "dir" && i.name !== "legacy" && /^\d{4}$/.test(i.name),
 			);
 			await Promise.all(
-				modernFolders.map(async (folder: any) => {
+				neoFolders.map(async (folder: any) => {
 					const res = await fetch(folder.url);
 					if (!res.ok) return;
 					const data = await res.json();
@@ -300,13 +336,12 @@ export class RecapService {
 					fetch(rawUrl).catch(() => null),
 				]);
 
-				if (!summaryRes.ok)
-					throw new Error("Failed to fetch modern recap data");
+				if (!summaryRes.ok) throw new Error("Failed to fetch neo recap data");
 
 				const summary = await summaryRes.json();
 				const rawData = rawRes && rawRes.ok ? await rawRes.json() : [];
 				const names = Object.keys(summary.counts || {});
-				const usersByName = await this.fetchModernUsersByNames(names);
+				const usersByName = await this.fetchNeoUsersByNames(names);
 
 				const contributors = Object.entries(summary.counts)
 					.map(([name, count]) => {
@@ -325,7 +360,7 @@ export class RecapService {
 					.sort((a, b) => b.contributions - a.contributions);
 
 				const data = {
-					isModern: true,
+					isNeo: true,
 					totalContributors: contributors.length,
 					contributors: contributors,
 					rawData: rawData,
