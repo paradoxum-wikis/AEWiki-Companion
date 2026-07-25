@@ -38,7 +38,10 @@ export class DeathBattleService {
 				data,
 				timestamp: Date.now(),
 			};
-			localStorage.setItem(this.getCacheKey(type), JSON.stringify(cacheData));
+			localStorage.setItem(
+				this.getCacheKey(type),
+				JSON.stringify(cacheData),
+			);
 			console.log(`Cached ${type} data`);
 		} catch (error) {
 			console.warn(`Error caching ${type} data:`, error);
@@ -54,7 +57,9 @@ export class DeathBattleService {
 			const response = await fetch(this.STATS_API);
 
 			if (!response.ok) {
-				throw new Error(`Failed to fetch battle stats: ${response.status}`);
+				throw new Error(
+					`Failed to fetch battle stats: ${response.status}`,
+				);
 			}
 
 			const data: BattleStats[] = await response.json();
@@ -75,13 +80,16 @@ export class DeathBattleService {
 			const response = await fetch(this.RECORDS_API);
 
 			if (!response.ok) {
-				throw new Error(`Failed to fetch battle records: ${response.status}`);
+				throw new Error(
+					`Failed to fetch battle records: ${response.status}`,
+				);
 			}
 
 			const data: BattleRecord[] = await response.json();
 			data.sort(
 				(a, b) =>
-					new Date(b.battleDate).getTime() - new Date(a.battleDate).getTime(),
+					new Date(b.battleDate).getTime() -
+					new Date(a.battleDate).getTime(),
 			);
 
 			this.setCachedData("records", data);

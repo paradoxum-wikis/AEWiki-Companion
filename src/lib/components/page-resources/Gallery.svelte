@@ -181,7 +181,11 @@
 		&:hover:not(:disabled),
 		&:focus-visible:not(:disabled) {
 			transform: translateY(-2px);
-			border-color: color-mix(in oklab, var(--primary) 60%, var(--border));
+			border-color: color-mix(
+				in oklab,
+				var(--primary) 60%,
+				var(--border)
+			);
 			box-shadow: 0 18px 40px rgb(0 0 0 / 0.18);
 
 			.surface-overlay {

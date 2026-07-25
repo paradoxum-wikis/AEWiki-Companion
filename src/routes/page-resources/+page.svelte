@@ -338,7 +338,11 @@
 
 	:global(.status-card) {
 		background: color-mix(in oklab, var(--destructive) 9%, var(--card));
-		border-color: color-mix(in oklab, var(--destructive) 35%, var(--border));
+		border-color: color-mix(
+			in oklab,
+			var(--destructive) 35%,
+			var(--border)
+		);
 	}
 
 	.status-copy {
@@ -400,7 +404,11 @@
 		flex-shrink: 0;
 
 		&.error {
-			background: color-mix(in oklab, var(--destructive) 18%, transparent);
+			background: color-mix(
+				in oklab,
+				var(--destructive) 18%,
+				transparent
+			);
 			color: var(--destructive);
 		}
 

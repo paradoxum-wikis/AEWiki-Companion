@@ -43,7 +43,10 @@
 			{#each games as game (game.key)}
 				<button
 					type="button"
-					class={["game-option", currentGame === game.key && "selected"]}
+					class={[
+						"game-option",
+						currentGame === game.key && "selected",
+					]}
 					onclick={() => onGameSwitch(game.key)}
 					aria-pressed={currentGame === game.key}
 				>
@@ -87,7 +90,11 @@
 		}
 
 		&.selected {
-			border-color: color-mix(in oklab, var(--primary) 65%, var(--border));
+			border-color: color-mix(
+				in oklab,
+				var(--primary) 65%,
+				var(--border)
+			);
 			background: color-mix(in oklab, var(--primary) 9%, var(--card));
 
 			.option-badge {

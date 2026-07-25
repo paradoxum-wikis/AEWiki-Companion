@@ -722,7 +722,11 @@
 
 		&.error-state {
 			flex-direction: row;
-			background: color-mix(in oklab, var(--destructive) 10%, transparent);
+			background: color-mix(
+				in oklab,
+				var(--destructive) 10%,
+				transparent
+			);
 			border-radius: 0.85rem;
 			margin: 1rem;
 			padding: 1.5rem;

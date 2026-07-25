@@ -264,28 +264,25 @@
 					<ul class="discord-perks">
 						<li>What's in there, you may ask? Well, we got:</li>
 						<li>
-							<span class="perk-dot"></span> A welcoming
-							community..!
+							<span class="perk-dot"></span> A welcoming community..!
 						</li>
 						<li>
-							<span class="perk-dot"></span> General
-							tomfoolery...
+							<span class="perk-dot"></span> General tomfoolery...
 						</li>
 						<li>
-							<span class="perk-dot"></span> A lot of crackpot
-							theories...
+							<span class="perk-dot"></span> A lot of crackpot theories...
 						</li>
 						<li>
-							<span class="perk-dot"></span> Random people getting
-							beaten up...
+							<span class="perk-dot"></span> Random people getting beaten
+							up...
 						</li>
 						<li>
-							<span class="perk-dot"></span> Ocassional
-							philosophical discussions!
+							<span class="perk-dot"></span> Ocassional philosophical
+							discussions!
 						</li>
 						<li>
-							<span class="perk-dot"></span> The most recent news
-							for ALTER EGO, of course!
+							<span class="perk-dot"></span> The most recent news for
+							ALTER EGO, of course!
 						</li>
 					</ul>
 				</div>
