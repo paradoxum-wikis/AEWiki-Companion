@@ -41,8 +41,7 @@
 					serverIconUrl = `https://cdn.discordapp.com/icons/${GUILD_ID}/${icon}.${ext}?size=64`;
 				}
 			}
-		} catch (e) {
-			console.warn("[DiscordWidget] Failed to load:", e);
+		} catch {
 			failed = true;
 		} finally {
 			loading = false;

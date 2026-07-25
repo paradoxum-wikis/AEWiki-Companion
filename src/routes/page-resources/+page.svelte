@@ -58,16 +58,12 @@
 		try {
 			let originalGameIconUrlFromAPI: string | null = null;
 
-			try {
-				const iconResult = await RobloxApiService.fetchGameIcon();
-				if (
-					iconResult.data?.[0]?.state === "Completed" &&
-					iconResult.data[0].imageUrl
-				) {
-					originalGameIconUrlFromAPI = iconResult.data[0].imageUrl;
-				}
-			} catch (iconError) {
-				console.error("Failed to fetch game icon:", iconError);
+			const iconResult = await RobloxApiService.fetchGameIcon();
+			if (
+				iconResult.data?.[0]?.state === "Completed" &&
+				iconResult.data[0].imageUrl
+			) {
+				originalGameIconUrlFromAPI = iconResult.data[0].imageUrl;
 			}
 
 			const gameResult = await RobloxApiService.fetchGameData();

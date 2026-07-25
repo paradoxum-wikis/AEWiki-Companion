@@ -12,15 +12,9 @@
 				"Clear all cached data and images? This frees storage, but assets will need to be re-downloaded.",
 			)
 		) {
-			try {
-				await clearImageCache();
-				clearCache();
-				onClearCache();
-				console.log("[imageCache] All caches cleared");
-			} catch (error) {
-				console.error("[imageCache] Failed to clear caches:", error);
-				alert("Failed to clear cache. Please try again.");
-			}
+			await clearImageCache();
+			clearCache();
+			onClearCache();
 		}
 	}
 </script>

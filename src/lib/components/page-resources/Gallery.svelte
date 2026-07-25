@@ -30,15 +30,10 @@
 		try {
 			const hdUrl = urlToUse.replace("/512/512/", "/1024/1024/");
 			await downloadImage(hdUrl, "game-icon-hd");
-		} catch (error) {
-			console.warn(
-				"[Gallery] HD download failed, falling back to the original icon:",
-				error,
-			);
+		} catch {
 			try {
 				await downloadImage(urlToUse, "game-icon");
-			} catch (fallbackError) {
-				console.error("[Gallery] Icon download failed:", fallbackError);
+			} catch {
 				alert("Failed to download game icon");
 			}
 		}

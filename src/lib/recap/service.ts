@@ -78,17 +78,11 @@ export class RecapService {
 		const chunkSize = 50;
 		const oneWeekMs = 7 * 24 * 60 * 60 * 1000;
 		const now = Date.now();
-		let cache: Record<
+		const raw = localStorage.getItem(this.neoUserCacheKey);
+		const cache: Record<
 			string,
 			{ userId: string; avatar: string; cachedAt: number }
-		> = {};
-
-		try {
-			const raw = localStorage.getItem(this.neoUserCacheKey);
-			if (raw) cache = JSON.parse(raw);
-		} catch (error) {
-			cache = {};
-		}
+		> = raw ? JSON.parse(raw) : {};
 
 		for (const name of userNames) {
 			const cached = cache[name];
@@ -107,69 +101,62 @@ export class RecapService {
 			const usersUrl = `${baseUrl}/api.php?action=query&list=users&ususers=${encodeURIComponent(batch.join("|"))}&format=json`;
 			const proxiedUsersUrl = `${this.proxyBase}${encodeURIComponent(usersUrl)}`;
 
-			try {
-				const usersResponse = await fetch(proxiedUsersUrl, {
-					credentials: "omit",
-				});
-				if (!usersResponse.ok) continue;
-				const usersData = await usersResponse.json();
-				const users = usersData?.query?.users;
-				if (!Array.isArray(users)) continue;
+			const usersResponse = await fetch(proxiedUsersUrl, {
+				credentials: "omit",
+			});
+			if (!usersResponse.ok) continue;
+			const usersData = await usersResponse.json();
+			const users = usersData?.query?.users;
+			if (!Array.isArray(users)) continue;
 
-				const idToName = new Map<string, string>();
-				for (const user of users) {
-					if (
-						typeof user?.name === "string" &&
-						typeof user?.userid === "number"
-					) {
-						idToName.set(String(user.userid), user.name);
-					}
+			const idToName = new Map<string, string>();
+			for (const user of users) {
+				if (
+					typeof user?.name === "string" &&
+					typeof user?.userid === "number"
+				) {
+					idToName.set(String(user.userid), user.name);
 				}
+			}
 
-				const ids = Array.from(idToName.keys());
-				if (ids.length === 0) continue;
+			const ids = Array.from(idToName.keys());
+			if (ids.length === 0) continue;
 
-				const detailsUrl = `${baseUrl}/wikia.php?controller=UserApi&method=getDetails&ids=${ids.join(",")}&format=json`;
-				const proxiedDetailsUrl = `${this.proxyBase}${encodeURIComponent(detailsUrl)}`;
-				const detailsResponse = await fetch(proxiedDetailsUrl, {
-					credentials: "omit",
-				});
-				if (!detailsResponse.ok) continue;
-				const detailsData = await detailsResponse.json();
-				const items = detailsData?.items;
-				if (!Array.isArray(items)) continue;
+			const detailsUrl = `${baseUrl}/wikia.php?controller=UserApi&method=getDetails&ids=${ids.join(",")}&format=json`;
+			const proxiedDetailsUrl = `${this.proxyBase}${encodeURIComponent(detailsUrl)}`;
+			const detailsResponse = await fetch(proxiedDetailsUrl, {
+				credentials: "omit",
+			});
+			if (!detailsResponse.ok) continue;
+			const detailsData = await detailsResponse.json();
+			const items = detailsData?.items;
+			if (!Array.isArray(items)) continue;
 
-				for (const item of items) {
-					if (
-						typeof item?.user_id === "number" &&
-						typeof item?.avatar === "string"
-					) {
-						const userId = String(item.user_id);
-						const name =
-							(typeof item?.name === "string" && item.name) ||
-							idToName.get(userId);
-						if (!name) continue;
+			for (const item of items) {
+				if (
+					typeof item?.user_id === "number" &&
+					typeof item?.avatar === "string"
+				) {
+					const userId = String(item.user_id);
+					const name =
+						(typeof item?.name === "string" && item.name) ||
+						idToName.get(userId);
+					if (!name) continue;
 
-						cache[name] = {
-							userId,
-							avatar: item.avatar,
-							cachedAt: now,
-						};
-						usersByName.set(name, {
-							userId,
-							avatar: item.avatar,
-						});
-					}
+					cache[name] = {
+						userId,
+						avatar: item.avatar,
+						cachedAt: now,
+					};
+					usersByName.set(name, {
+						userId,
+						avatar: item.avatar,
+					});
 				}
-			} catch (error) {
-				continue;
 			}
 		}
 
-		try {
-			localStorage.setItem(this.neoUserCacheKey, JSON.stringify(cache));
-		} catch (error) {}
-
+		localStorage.setItem(this.neoUserCacheKey, JSON.stringify(cache));
 		return usersByName;
 	}
 
@@ -177,14 +164,9 @@ export class RecapService {
 		wiki: WikiMode,
 		dateString: string,
 	): RecapData | null {
-		try {
-			const cacheKey = this.getCacheKey(wiki, dateString);
-			const cached = localStorage.getItem(cacheKey);
-			if (!cached) return null;
-			return JSON.parse(cached);
-		} catch (error) {
-			return null;
-		}
+		const cached = localStorage.getItem(this.getCacheKey(wiki, dateString));
+		if (!cached) return null;
+		return JSON.parse(cached);
 	}
 
 	private static setCachedData(
@@ -192,126 +174,90 @@ export class RecapService {
 		dateString: string,
 		data: any,
 	): void {
-		try {
-			localStorage.setItem(
-				this.getCacheKey(wiki, dateString),
-				JSON.stringify(data),
-			);
-		} catch (error) {
-			this.clearOldestEntries();
-		}
-	}
-
-	private static clearOldestEntries(): void {
-		try {
-			const cacheEntries: { key: string; date: string }[] = [];
-			for (let i = 0; i < localStorage.length; i++) {
-				const key = localStorage.key(i);
-				if (
-					key &&
-					(key.startsWith("aew-recap-") ||
-						key.startsWith("tdsw-recap-"))
-				) {
-					cacheEntries.push({ key, date: key });
-				}
-			}
-			const entriesToRemove = Math.ceil(cacheEntries.length * 0.25);
-			for (
-				let i = 0;
-				i < entriesToRemove && i < cacheEntries.length;
-				i++
-			) {
-				localStorage.removeItem(cacheEntries[i].key);
-			}
-		} catch (error) {}
+		localStorage.setItem(
+			this.getCacheKey(wiki, dateString),
+			JSON.stringify(data),
+		);
 	}
 
 	private static async fetchAvailableFiles(
 		wiki: WikiMode,
 	): Promise<Set<string>> {
-		try {
-			const indexKey = this.getIndexCacheKey(wiki);
-			const cached = localStorage.getItem(indexKey);
-			if (cached) {
-				const { timestamp, files } = JSON.parse(cached);
-				if (Date.now() - timestamp < 1 * 24 * 60 * 60 * 1000) {
-					return new Set(files);
-				}
+		const indexKey = this.getIndexCacheKey(wiki);
+		const cached = localStorage.getItem(indexKey);
+		if (cached) {
+			const { timestamp, files } = JSON.parse(cached);
+			if (Date.now() - timestamp < 1 * 24 * 60 * 60 * 1000) {
+				return new Set(files);
 			}
+		}
 
-			const availableFiles = new Set<string>();
-			const rootResponse = await fetch(this.getApiBase(wiki));
-			if (!rootResponse.ok)
-				throw new Error(`Failed to fetch root: ${rootResponse.status}`);
-			const rootData = await rootResponse.json();
+		const availableFiles = new Set<string>();
+		const rootResponse = await fetch(this.getApiBase(wiki));
+		if (!rootResponse.ok)
+			throw new Error(`Failed to fetch root: ${rootResponse.status}`);
+		const rootData = await rootResponse.json();
 
-			const neoFolders = rootData.filter(
-				(i: any) =>
-					i.type === "dir" &&
-					i.name !== "legacy" &&
-					/^\d{4}$/.test(i.name),
-			);
-			await Promise.all(
-				neoFolders.map(async (folder: any) => {
-					const res = await fetch(folder.url);
-					if (!res.ok) return;
-					const data = await res.json();
-					data.forEach((item: any) => {
+		const neoFolders = rootData.filter(
+			(i: any) =>
+				i.type === "dir" &&
+				i.name !== "legacy" &&
+				/^\d{4}$/.test(i.name),
+		);
+		await Promise.all(
+			neoFolders.map(async (folder: any) => {
+				const res = await fetch(folder.url);
+				if (!res.ok) return;
+				const data = await res.json();
+				data.forEach((item: any) => {
+					const match = item.name.match(/^(\d{4}-\d{2}-\d{2})\.json$/);
+					if (match) availableFiles.add(match[1]);
+				});
+			}),
+		);
+
+		const legacyFolder = rootData.find((i: any) => i.name === "legacy");
+		if (legacyFolder) {
+			const legacyRes = await fetch(legacyFolder.url);
+			if (legacyRes.ok) {
+				const legacyData = await legacyRes.json();
+				legacyData.forEach((item: any) => {
+					if (item.type === "file") {
 						const match = item.name.match(
-							/^(\d{4}-\d{2}-\d{2})\.json$/,
+							/^recap-(\d{4}-\d{2}-\d{2})\.json$/,
 						);
 						if (match) availableFiles.add(match[1]);
-					});
-				}),
-			);
+					}
+				});
 
-			const legacyFolder = rootData.find((i: any) => i.name === "legacy");
-			if (legacyFolder) {
-				const legacyRes = await fetch(legacyFolder.url);
-				if (legacyRes.ok) {
-					const legacyData = await legacyRes.json();
-					legacyData.forEach((item: any) => {
-						if (item.type === "file") {
+				const legacyYearFolders = legacyData.filter(
+					(i: any) => i.type === "dir" && /^\d{4}$/.test(i.name),
+				);
+				await Promise.all(
+					legacyYearFolders.map(async (folder: any) => {
+						const res = await fetch(folder.url);
+						if (!res.ok) return;
+						const data = await res.json();
+						data.forEach((item: any) => {
 							const match = item.name.match(
 								/^recap-(\d{4}-\d{2}-\d{2})\.json$/,
 							);
 							if (match) availableFiles.add(match[1]);
-						}
-					});
-
-					const legacyYearFolders = legacyData.filter(
-						(i: any) => i.type === "dir" && /^\d{4}$/.test(i.name),
-					);
-					await Promise.all(
-						legacyYearFolders.map(async (folder: any) => {
-							const res = await fetch(folder.url);
-							if (!res.ok) return;
-							const data = await res.json();
-							data.forEach((item: any) => {
-								const match = item.name.match(
-									/^recap-(\d{4}-\d{2}-\d{2})\.json$/,
-								);
-								if (match) availableFiles.add(match[1]);
-							});
-						}),
-					);
-				}
-			}
-
-			try {
-				localStorage.setItem(
-					indexKey,
-					JSON.stringify({
-						timestamp: Date.now(),
-						files: Array.from(availableFiles),
+						});
 					}),
 				);
-			} catch (e) {}
-
-			return availableFiles;
-		} catch (error) {
-			return new Set<string>();
+			}
 		}
+
+		localStorage.setItem(
+			indexKey,
+			JSON.stringify({
+				timestamp: Date.now(),
+				files: Array.from(availableFiles),
+			}),
+		);
+
+		return availableFiles;
 	}
 
 	private static async ensureAvailableFiles(wiki: WikiMode): Promise<void> {
@@ -356,90 +302,79 @@ export class RecapService {
 		const { year } = this.parseDate(dateString);
 		const isLegacy = this.isLegacyFormat(wiki, dateString);
 
-		try {
-			if (isLegacy) {
-				const filename = `recap-${dateString}.json`;
-				const yearUrl = `${this.getRawBase(wiki)}/legacy/${year}/${filename}`;
-				const directUrl = `${this.getRawBase(wiki)}/legacy/${filename}`;
+		if (isLegacy) {
+			const filename = `recap-${dateString}.json`;
+			const yearUrl = `${this.getRawBase(wiki)}/legacy/${year}/${filename}`;
+			const directUrl = `${this.getRawBase(wiki)}/legacy/${filename}`;
 
-				let response = await fetch(yearUrl);
-				if (!response.ok) response = await fetch(directUrl);
-				if (!response.ok)
-					throw new Error(`Failed to fetch legacy data`);
+			let response = await fetch(yearUrl);
+			if (!response.ok) response = await fetch(directUrl);
+			if (!response.ok) throw new Error(`Failed to fetch legacy data`);
 
-				const data = await response.json();
-				this.setCachedData(wiki, dateString, data);
-				return data;
-			} else {
-				const summaryUrl = `${this.getRawBase(wiki)}/${year}/${dateString}.json`;
-				const rawUrl = `${this.getRawBase(wiki)}/${year}/${dateString}.raw.json`;
-
-				const [summaryRes, rawRes] = await Promise.all([
-					fetch(summaryUrl),
-					fetch(rawUrl).catch(() => null),
-				]);
-
-				if (!summaryRes.ok)
-					throw new Error("Failed to fetch neo recap data");
-
-				const summary = await summaryRes.json();
-				const rawData = rawRes && rawRes.ok ? await rawRes.json() : [];
-				const counts = (summary?.counts || {}) as Record<
-					string,
-					number
-				>;
-				const relevantByName = (summary?.irrelevantCounts ||
-					null) as Record<
-					string,
-					{ relevant?: number; change?: number }
-				> | null;
-				const names = Object.keys(counts);
-				const usersByName = await this.fetchNeoUsersByNames(names);
-
-				const contributors = Object.entries(counts)
-					.map(([name, count]) => {
-						const userInfo = usersByName.get(name);
-						const userId = userInfo?.userId || "N/A";
-						const avatar =
-							userInfo?.avatar || RecapService.fallbackAvatar;
-						const totalContributions = Number(count) || 0;
-						const relevantCandidate = Number(
-							relevantByName?.[name]?.relevant,
-						);
-						const hasRelevantContributions =
-							Number.isFinite(relevantCandidate);
-
-						return {
-							userName: name,
-							userId,
-							avatar,
-							contributions: hasRelevantContributions
-								? relevantCandidate
-								: totalContributions,
-							totalContributions,
-							hasRelevantContributions,
-							isAdmin: false,
-						};
-					})
-					.sort(
-						(a, b) =>
-							b.contributions - a.contributions ||
-							b.totalContributions - a.totalContributions,
-					);
-
-				const data = {
-					isNeo: true,
-					totalContributors: contributors.length,
-					contributors: contributors,
-					rawData: rawData,
-				};
-
-				this.setCachedData(wiki, dateString, data);
-				return data;
-			}
-		} catch (error) {
-			throw error;
+			const data = await response.json();
+			this.setCachedData(wiki, dateString, data);
+			return data;
 		}
+
+		const summaryUrl = `${this.getRawBase(wiki)}/${year}/${dateString}.json`;
+		const rawUrl = `${this.getRawBase(wiki)}/${year}/${dateString}.raw.json`;
+
+		const [summaryRes, rawRes] = await Promise.all([
+			fetch(summaryUrl),
+			fetch(rawUrl).catch(() => null),
+		]);
+
+		if (!summaryRes.ok) throw new Error("Failed to fetch neo recap data");
+
+		const summary = await summaryRes.json();
+		const rawData = rawRes && rawRes.ok ? await rawRes.json() : [];
+		const counts = (summary?.counts || {}) as Record<string, number>;
+		const relevantByName = (summary?.irrelevantCounts || null) as Record<
+			string,
+			{ relevant?: number; change?: number }
+		> | null;
+		const names = Object.keys(counts);
+		const usersByName = await this.fetchNeoUsersByNames(names);
+
+		const contributors = Object.entries(counts)
+			.map(([name, count]) => {
+				const userInfo = usersByName.get(name);
+				const userId = userInfo?.userId || "N/A";
+				const avatar = userInfo?.avatar || RecapService.fallbackAvatar;
+				const totalContributions = Number(count) || 0;
+				const relevantCandidate = Number(
+					relevantByName?.[name]?.relevant,
+				);
+				const hasRelevantContributions =
+					Number.isFinite(relevantCandidate);
+
+				return {
+					userName: name,
+					userId,
+					avatar,
+					contributions: hasRelevantContributions
+						? relevantCandidate
+						: totalContributions,
+					totalContributions,
+					hasRelevantContributions,
+					isAdmin: false,
+				};
+			})
+			.sort(
+				(a, b) =>
+					b.contributions - a.contributions ||
+					b.totalContributions - a.totalContributions,
+			);
+
+		const data = {
+			isNeo: true,
+			totalContributors: contributors.length,
+			contributors: contributors,
+			rawData: rawData,
+		};
+
+		this.setCachedData(wiki, dateString, data);
+		return data;
 	}
 
 	static extractAvatarUrl(avatarSource: string): string {

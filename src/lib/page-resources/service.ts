@@ -80,21 +80,17 @@ export class RobloxApiService {
 		const targetUrl = `https://assetdelivery.roblox.com/v2/assetId/${imageId}`;
 		const proxyUrl = `${this.PROXY_BASE}${encodeURIComponent(targetUrl)}`;
 
-		try {
-			const response = await fetch(proxyUrl, { credentials: "omit" });
-			if (!response.ok) return null;
+		const response = await fetch(proxyUrl, { credentials: "omit" });
+		if (!response.ok) return null;
 
-			const result: RobloxAssetDeliveryResponse = await response.json();
-			if (
-				result.locations &&
-				result.locations.length > 0 &&
-				result.locations[0].location
-			) {
-				return result.locations[0].location;
-			}
-			return null;
-		} catch {
-			return null;
+		const result: RobloxAssetDeliveryResponse = await response.json();
+		if (
+			result.locations &&
+			result.locations.length > 0 &&
+			result.locations[0].location
+		) {
+			return result.locations[0].location;
 		}
+		return null;
 	}
 }

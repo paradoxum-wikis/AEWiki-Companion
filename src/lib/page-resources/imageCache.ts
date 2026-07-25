@@ -112,35 +112,19 @@ class ImageCacheDB {
 const imageCache = new ImageCacheDB();
 
 export async function getCachedImageUrl(originalUrl: string): Promise<string> {
-	try {
-		const cachedUrl = await imageCache.getCachedImage(originalUrl);
-		if (cachedUrl) {
-			console.log("[imageCache] Using cached image for:", originalUrl);
-			return cachedUrl;
-		}
+	const cachedUrl = await imageCache.getCachedImage(originalUrl);
+	if (cachedUrl) return cachedUrl;
 
-		console.log("[imageCache] Fetching and caching image:", originalUrl);
-		const response = await fetch(originalUrl);
-		if (!response.ok) {
-			throw new Error(`Failed to fetch image: ${response.status}`);
-		}
-
-		const blob = await response.blob();
-		await imageCache.cacheImage(originalUrl, blob);
-
-		const blobUrl = URL.createObjectURL(blob);
-		return blobUrl;
-	} catch (error) {
-		console.error("[imageCache] Failed to cache image:", error);
-		return originalUrl;
+	const response = await fetch(originalUrl);
+	if (!response.ok) {
+		throw new Error(`Failed to fetch image: ${response.status}`);
 	}
+
+	const blob = await response.blob();
+	await imageCache.cacheImage(originalUrl, blob);
+	return URL.createObjectURL(blob);
 }
 
 export async function clearImageCache(): Promise<void> {
-	try {
-		await imageCache.clearAllImages();
-		console.log("[imageCache] Image cache cleared");
-	} catch (error) {
-		console.error("[imageCache] Failed to clear image cache:", error);
-	}
+	await imageCache.clearAllImages();
 }
