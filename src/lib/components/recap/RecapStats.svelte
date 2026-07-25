@@ -20,7 +20,7 @@
 		<div class="card card-week">
 			<div class="card-accent-bar"></div>
 			<div class="card-icon-row">
-				<div class="card-icon"><Calendar class="size-5" /></div>
+				<div class="card-icon"><Calendar /></div>
 			</div>
 			<div class="card-body">
 				<h2 class="card-title">Current Week</h2>
@@ -34,7 +34,7 @@
 		<div class="card card-contributors">
 			<div class="card-accent-bar"></div>
 			<div class="card-icon-row">
-				<div class="card-icon"><Users class="size-5" /></div>
+				<div class="card-icon"><Users /></div>
 			</div>
 			<div class="card-body">
 				<h2 class="card-title">Total Contributors</h2>
@@ -46,7 +46,7 @@
 		<div class="card card-impact">
 			<div class="card-accent-bar"></div>
 			<div class="card-icon-row">
-				<div class="card-icon"><ChartColumn class="size-5" /></div>
+				<div class="card-icon"><ChartColumn /></div>
 			</div>
 			<div class="card-body">
 				<h2 class="card-title">Top 3's Impact</h2>
@@ -58,7 +58,7 @@
 		<div class="card card-average">
 			<div class="card-accent-bar"></div>
 			<div class="card-icon-row">
-				<div class="card-icon"><Activity class="size-5" /></div>
+				<div class="card-icon"><Activity /></div>
 			</div>
 			<div class="card-body">
 				<h2 class="card-title">Average per User</h2>
@@ -174,5 +174,9 @@
 		font-weight: 800;
 		color: var(--foreground);
 		margin: 0;
+	}
+
+	.card-body {
+		min-width: 0;
 	}
 </style>

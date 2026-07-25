@@ -37,8 +37,8 @@
 	<div class="card card-featured">
 		<div class="card-accent-bar"></div>
 		<div class="card-header">
-			<ListOrdered class="header-icon size-5" />
-			<h2 class="card-title mb-0">Leaderboard</h2>
+			<ListOrdered class="header-icon" />
+			<h2 class="card-title">Leaderboard</h2>
 		</div>
 
 		<div class="card-body p-0">
@@ -55,9 +55,15 @@
 					</div>
 				{:else if contributors?.length === 0}
 					<div class="empty-state">
-						<Inbox class="mb-4 size-12 text-muted-foreground opacity-50" />
-						<h5>No contributors found</h5>
-						<p>No contribution data available for this week.</p>
+						<Inbox
+							class="mb-4 size-12 text-muted-foreground opacity-50"
+						/>
+						<h5 class="text-muted-foreground font-semibold mb-1">
+							No contributors found
+						</h5>
+						<p class="text-muted-foreground text-sm m-0">
+							No contribution data available for this week.
+						</p>
 					</div>
 				{:else if contributors}
 					{#each contributors as contributor, i (contributor.userName)}
@@ -65,52 +71,75 @@
 							contributor.avatar,
 						)}
 						<button
-							class="leaderboard-item"
+							class="leaderboard-item text-left flex items-center gap-4 w-full cursor-pointer hover:bg-muted/50 transition-colors border-b border-border p-4 last:border-0"
 							onclick={() =>
 								window.open(
-									getUserProfileUrl(contributor.userName, wikiMode),
+									getUserProfileUrl(
+										contributor.userName,
+										wikiMode,
+									),
 									"_blank",
 								)}
 						>
 							<div
-								class={["leaderboard-rank", i < 3 && `rank-${i + 1}`]}
+								class="leaderboard-rank flex shrink-0 justify-center items-center w-10 font-bold text-lg {i <
+								3
+									? `rank-${i + 1}`
+									: ''}"
 							>
-								{#if i === 0}<Trophy class="size-5" />
-								{:else if i === 1}<Award class="size-5" />
-								{:else if i === 2}<CircleStar class="size-5" />
+								{#if i === 0}<Trophy class="text-yellow-400" />
+								{:else if i === 1}<Award
+										class="text-gray-400"
+									/>
+								{:else if i === 2}<CircleStar
+										class="text-amber-600"
+									/>
 								{:else}{i + 1}{/if}
 							</div>
 
 							<img
 								src={avatarUrl}
 								alt={contributor.userName}
-								class="contributor-avatar"
+								class="contributor-avatar shrink-0 h-12 w-12 rounded-full border border-border object-cover"
 								onerror={(e) => {
-									const el = e.currentTarget as HTMLImageElement;
-									if (el.src !== RecapService.fallbackAvatar) {
+									const el =
+										e.currentTarget as HTMLImageElement;
+									if (
+										el.src !== RecapService.fallbackAvatar
+									) {
 										el.src = RecapService.fallbackAvatar;
 									}
 								}}
 							/>
 
-							<div class="contributor-info">
-								<h6>
+							<div class="contributor-info flex-1 min-w-0">
+								<h6
+									class="m-0 mb-1 text-foreground font-semibold truncate text-base"
+								>
 									{contributor.userName}
 									{#if contributor.isAdmin}
-										<span class="admin-badge">Administrator</span>
+										<span
+											class="admin-badge ms-2 px-2 py-0.5 text-[0.65rem] tracking-wider rounded font-bold bg-primary/10 text-primary"
+											>Administrator</span
+										>
 									{/if}
 								</h6>
 								{#if contributor.userId && contributor.userId !== "N/A"}
-									<small>
-										<UserIcon class="me-1 inline size-3" />
+									<small
+										class="text-muted-foreground flex items-center text-xs"
+									>
+										<UserIcon class="me-1" size={12} />
 										User ID: {contributor.userId}
 									</small>
 								{/if}
 							</div>
 
-							<div class="text-end">
-								<div class="contributions-count">
-									<span use:countUp={contributor.contributions}
+							<div class="text-right shrink-0">
+								<div
+									class="contributions-count text-primary text-xl font-bold"
+								>
+									<span
+										use:countUp={contributor.contributions}
 										>0</span
 									>
 									{#if contributor.hasRelevantContributions}
@@ -124,7 +153,11 @@
 										</span>
 									{/if}
 								</div>
-								<small class="contributions-text"> contributions </small>
+								<small
+									class="text-muted-foreground contributions-text text-xs"
+								>
+									contributions
+								</small>
 							</div>
 						</button>
 					{/each}
@@ -139,7 +172,8 @@
 			{#each contributors as c, i (c.userName)}
 				<div
 					class="h-full transition-all duration-500 hover:opacity-80"
-					style="width:{(Number(c.contributions) / totalContributions) *
+					style="width:{(Number(c.contributions) /
+						totalContributions) *
 						100}%;background:{getPaletteColor(i)}"
 					title={getContributionTitle(c)}
 				></div>
@@ -147,7 +181,9 @@
 		</div>
 		<div class="mb-4 flex flex-wrap items-center gap-3 px-1">
 			{#each contributors as c, i (c.userName)}
-				<span class="flex items-center text-sm text-muted-foreground font-medium">
+				<span
+					class="flex items-center text-sm text-muted-foreground font-medium"
+				>
 					<span
 						class="inline-block me-2 h-3 w-3 rounded-sm"
 						style="background:{getPaletteColor(i)};"

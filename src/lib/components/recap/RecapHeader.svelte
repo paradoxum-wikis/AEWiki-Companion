@@ -18,7 +18,7 @@
 
 <div class="recap-header">
 	<h1 class="header-title">
-		<Trophy class="size-6 text-primary" />
+		<Trophy />
 		Weekly Contributor Leaderboard
 	</h1>
 	<div class="nav-controls">
