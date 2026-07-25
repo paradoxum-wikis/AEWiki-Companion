@@ -1,5 +1,11 @@
 <script lang="ts">
-	import { Trophy, ChevronLeft, ChevronRight } from "@lucide/svelte";
+	import { Trophy, ChevronLeft, ChevronRight, ChevronDown } from "@lucide/svelte";
+	import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
+
+	const wikiOptions = [
+		{ value: "aew", label: "ALTER EGO" },
+		{ value: "tdsw", label: "Tower Defense Simulator" },
+	] as const;
 
 	let {
 		wikiMode = $bindable(),
@@ -14,6 +20,16 @@
 		onModeSwitch: () => void;
 		onNavigate: (dir: "prev" | "next") => void;
 	} = $props();
+
+	let wikiLabel = $derived(
+		wikiOptions.find((option) => option.value === wikiMode)!.label,
+	);
+
+	function handleWikiChange(value: string) {
+		if (value === wikiMode) return;
+		wikiMode = value as "aew" | "tdsw";
+		onModeSwitch();
+	}
 </script>
 
 <div class="recap-header">
@@ -22,15 +38,28 @@
 		Weekly Contributor Leaderboard
 	</h1>
 	<div class="nav-controls">
-		<select
-			class="nav-btn"
-			bind:value={wikiMode}
-			onchange={onModeSwitch}
-			aria-label="Select Wiki"
-		>
-			<option value="aew">ALTER EGO</option>
-			<option value="tdsw">Tower Defense Simulator</option>
-		</select>
+		<DropdownMenu.Root>
+			<DropdownMenu.Trigger>
+				{#snippet child({ props })}
+					<button {...props} class="nav-btn" aria-label="Select Wiki">
+						{wikiLabel}
+						<ChevronDown class="size-4 opacity-60" />
+					</button>
+				{/snippet}
+			</DropdownMenu.Trigger>
+			<DropdownMenu.Content align="end" class="w-56">
+				<DropdownMenu.RadioGroup
+					value={wikiMode}
+					onValueChange={handleWikiChange}
+				>
+					{#each wikiOptions as option (option.value)}
+						<DropdownMenu.RadioItem value={option.value}>
+							{option.label}
+						</DropdownMenu.RadioItem>
+					{/each}
+				</DropdownMenu.RadioGroup>
+			</DropdownMenu.Content>
+		</DropdownMenu.Root>
 		<button
 			class="nav-btn"
 			disabled={prevDisabled}

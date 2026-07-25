@@ -71,7 +71,7 @@
 							contributor.avatar,
 						)}
 						<button
-							class="leaderboard-item text-left flex items-center gap-4 w-full cursor-pointer hover:bg-muted/50 transition-colors border-b border-border p-4 last:border-0"
+							class="text-left flex items-center gap-4 w-full cursor-pointer hover:bg-muted/50 transition-colors border-b border-border p-4 last:border-0"
 							onclick={() =>
 								window.open(
 									getUserProfileUrl(
@@ -82,10 +82,7 @@
 								)}
 						>
 							<div
-								class="leaderboard-rank flex shrink-0 justify-center items-center w-10 font-bold text-lg {i <
-								3
-									? `rank-${i + 1}`
-									: ''}"
+								class="flex shrink-0 justify-center items-center w-10 font-bold text-lg"
 							>
 								{#if i === 0}<Trophy class="text-yellow-400" />
 								{:else if i === 1}<Award
@@ -100,7 +97,7 @@
 							<img
 								src={avatarUrl}
 								alt={contributor.userName}
-								class="contributor-avatar shrink-0 h-12 w-12 rounded-full border border-border object-cover"
+								class="shrink-0 h-12 w-12 rounded-full border border-border object-cover"
 								onerror={(e) => {
 									const el =
 										e.currentTarget as HTMLImageElement;
@@ -112,14 +109,14 @@
 								}}
 							/>
 
-							<div class="contributor-info flex-1 min-w-0">
+							<div class="flex-1 min-w-0">
 								<h6
 									class="m-0 mb-1 text-foreground font-semibold truncate text-base"
 								>
 									{contributor.userName}
 									{#if contributor.isAdmin}
 										<span
-											class="admin-badge ms-2 px-2 py-0.5 text-[0.65rem] tracking-wider rounded font-bold bg-primary/10 text-primary"
+											class="ms-2 px-2 py-0.5 text-[0.65rem] tracking-wider rounded font-bold bg-primary/10 text-primary"
 											>Administrator</span
 										>
 									{/if}
@@ -135,9 +132,7 @@
 							</div>
 
 							<div class="text-right shrink-0">
-								<div
-									class="contributions-count text-primary text-xl font-bold"
-								>
+								<div class="text-primary text-xl font-bold">
 									<span
 										use:countUp={contributor.contributions}
 										>0</span
@@ -153,9 +148,7 @@
 										</span>
 									{/if}
 								</div>
-								<small
-									class="text-muted-foreground contributions-text text-xs"
-								>
+								<small class="text-muted-foreground text-xs">
 									contributions
 								</small>
 							</div>
