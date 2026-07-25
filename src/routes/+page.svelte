@@ -10,6 +10,7 @@
 		ExternalLink,
 	} from "@lucide/svelte";
 	import DiscordWidget from "$lib/components/Discord.svelte";
+	import PageShell from "$lib/components/PageShell.svelte";
 </script>
 
 <svelte:head>
@@ -54,15 +55,7 @@
 	<link rel="canonical" href="https://ae.tds-editor.com/" />
 </svelte:head>
 
-<div class="page-root">
-	<div class="bg-mesh" aria-hidden="true">
-		<div class="mesh-orb orb-1"></div>
-		<div class="mesh-orb orb-2"></div>
-		<div class="mesh-orb orb-3"></div>
-		<div class="grid-lines"></div>
-	</div>
-
-	<main class="page-main">
+<PageShell>
 		<section class="hero">
 			<h1 class="hero-title">
 				<span class="hero-title-line1">Welcome,</span>
@@ -289,8 +282,7 @@
 				<DiscordWidget />
 			</div>
 		</section>
-	</main>
-</div>
+</PageShell>
 
 <style>
 	.hero {

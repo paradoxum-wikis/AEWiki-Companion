@@ -1,6 +1,5 @@
 <script lang="ts">
-	import "../styles/main.css";
-	import "../styles/global.css";
+	import "./layout.css";
 
 	import { ModeWatcher, toggleMode } from "mode-watcher";
 	import { SunIcon, MoonIcon, CodeXml } from "@lucide/svelte";

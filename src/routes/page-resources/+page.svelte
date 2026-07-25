@@ -17,6 +17,7 @@
 	import HeroSection from "$lib/components/page-resources/HeroSection.svelte";
 	import LoadingButton from "$lib/components/page-resources/LoadingButton.svelte";
 	import Settings from "$lib/components/page-resources/Settings.svelte";
+	import PageShell from "$lib/components/PageShell.svelte";
 
 	let currentGame = $state<GameType>("TDS");
 	let loading = $state(false);
@@ -215,15 +216,7 @@
 	/>
 </svelte:head>
 
-<div class="page-root">
-	<div class="bg-mesh" aria-hidden="true">
-		<div class="mesh-orb orb-1"></div>
-		<div class="mesh-orb orb-2"></div>
-		<div class="mesh-orb orb-3"></div>
-		<div class="grid-lines"></div>
-	</div>
-
-	<main class="page-main page-enter">
+<PageShell>
 		<HeroSection {currentGame} />
 
 		<section class="utility-shell">
@@ -316,8 +309,7 @@
 				</Card.Content>
 			</Card.Root>
 		</section>
-	</main>
-</div>
+</PageShell>
 
 <style>
 	.utility-shell,

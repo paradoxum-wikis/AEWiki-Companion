@@ -1,4 +1,4 @@
-import type { RecapData, DateInfo } from "../../types";
+import type { RecapData, DateInfo } from "$lib/types";
 
 export type WikiMode = "aew" | "tdsw";
 

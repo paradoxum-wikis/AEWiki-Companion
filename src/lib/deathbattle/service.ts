@@ -1,4 +1,4 @@
-import type { BattleStats, BattleRecord } from "../../types";
+import type { BattleStats, BattleRecord } from "$lib/types";
 
 export class DeathBattleService {
 	private static readonly STATS_API =
