@@ -1,33 +1,35 @@
 <script lang="ts">
-	import * as Card from "$lib/components/ui/card/index.js";
-
-	interface Props {
+	let {
+		label,
+		value,
+		children,
+	}: {
 		label: string;
 		value: string | number;
 		children?: import("svelte").Snippet;
-	}
-
-	let { label, value, children }: Props = $props();
+	} = $props();
 </script>
 
-<Card.Root>
-	<Card.Content class="stat-card-content">
-		<div class="tds-icon-well tds-icon-well--accent">
-			{@render children?.()}
-		</div>
-		<div class="stat-body">
-			<span class="stat-label">{label}</span>
-			<strong class="stat-value">{value}</strong>
-		</div>
-	</Card.Content>
-</Card.Root>
+<div class="stat-card">
+	<div class="tds-icon-well tds-icon-well--accent">
+		{@render children?.()}
+	</div>
+	<div class="stat-body">
+		<span class="stat-label">{label}</span>
+		<strong class="stat-value">{value}</strong>
+	</div>
+</div>
 
 <style>
-	:global([data-slot="card-content"].stat-card-content) {
+	.stat-card {
 		display: flex;
 		align-items: center;
 		gap: 1rem;
 		padding: 1.25rem 1.5rem;
+		border: 1px solid var(--border);
+		border-radius: 0.85rem;
+		background: var(--card);
+		color: var(--card-foreground);
 	}
 
 	.stat-body {

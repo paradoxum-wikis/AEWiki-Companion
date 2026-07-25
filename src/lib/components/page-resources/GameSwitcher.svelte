@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Bird, Gamepad2 } from "@lucide/svelte";
-	import * as Card from "$lib/components/ui/card/index.js";
-	import type { GameType } from "../../../modules/types.js";
+	import * as Card from "$lib/components/ui/card/index";
+	import type { GameType } from "$lib/page-resources/types";
 
 	let {
 		currentGame,
@@ -27,9 +27,9 @@
 
 <div class="game-switcher">
 	<Card.Root class="h-full">
-		<Card.Header>
+		<Card.Header class="flex flex-row items-start gap-3.5">
 			<div class="tds-icon-well tds-icon-well--muted">
-				<Gamepad2 />
+				<Gamepad2 class="size-5" />
 			</div>
 			<div>
 				<Card.Title>Select Game</Card.Title>
@@ -39,22 +39,19 @@
 			</div>
 		</Card.Header>
 
-		<Card.Content>
-			{#each games as game}
+		<Card.Content class="grid gap-3.5">
+			{#each games as game (game.key)}
 				<button
 					type="button"
-					class:selected={currentGame === game.key}
-					class="game-option"
+					class={["game-option", currentGame === game.key && "selected"]}
 					onclick={() => onGameSwitch(game.key)}
 					aria-pressed={currentGame === game.key}
 				>
 					<div class="tds-inline-title tds-inline-title--center">
 						<div class="tds-icon-well tds-icon-well--accent">
-							<game.icon />
+							<game.icon class="size-5" />
 						</div>
-						<div class="option-text">
-							<div class="option-title">{game.name}</div>
-						</div>
+						<div class="option-title">{game.name}</div>
 					</div>
 
 					<span class="option-badge">
@@ -67,17 +64,6 @@
 </div>
 
 <style>
-	.game-switcher :global([data-slot="card-header"]) {
-		display: flex;
-		align-items: flex-start;
-		gap: 0.9rem;
-	}
-
-	.game-switcher :global([data-slot="card-content"]) {
-		display: grid;
-		gap: 0.85rem;
-	}
-
 	.game-option {
 		width: 100%;
 		display: flex;
@@ -101,17 +87,20 @@
 		}
 
 		&.selected {
-			border-color: color-mix(
-				in oklab,
-				var(--primary) 65%,
-				var(--border)
-			);
+			border-color: color-mix(in oklab, var(--primary) 65%, var(--border));
 			background: color-mix(in oklab, var(--primary) 9%, var(--card));
-		}
-	}
 
-	.option-text {
-		min-width: 0;
+			.option-badge {
+				background: var(--primary);
+				border-color: var(--primary);
+				color: var(--primary-foreground);
+			}
+		}
+
+		@media (width < 40rem) {
+			flex-direction: column;
+			align-items: stretch;
+		}
 	}
 
 	.option-title {
@@ -125,24 +114,11 @@
 		align-items: center;
 		justify-content: center;
 		padding: 0.45rem 0.75rem;
-		border-radius: 999px;
+		border-radius: 0.375rem;
 		font-size: 0.78rem;
 		font-weight: 700;
 		border: 1px solid var(--border);
 		background: var(--background);
 		color: var(--foreground);
-
-		.game-option.selected & {
-			background: var(--primary);
-			border-color: var(--primary);
-			color: var(--primary-foreground);
-		}
-	}
-
-	@media (max-width: 640px) {
-		.game-option {
-			flex-direction: column;
-			align-items: stretch;
-		}
 	}
 </style>

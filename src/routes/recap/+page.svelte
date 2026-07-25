@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { onMount } from "svelte";
-	import { RecapService } from "$lib/recap/service.js";
-	import type { Contributor, RecapData } from "../../types.js";
+	import { RecapService } from "$lib/recap/service";
+	import type { Contributor, RecapData } from "../../types";
 	import "./recap.css";
 
-	import * as Chart from "$lib/components/ui/chart/index.js";
-	import * as Card from "$lib/components/ui/card/index.js";
+	import * as Chart from "$lib/components/ui/chart/index";
+	import * as Card from "$lib/components/ui/card/index";
 	import { scaleBand } from "d3-scale";
 	import { BarChart, PieChart, Arc, Text, LineChart } from "layerchart";
 	import { curveNatural } from "d3-shape";
@@ -441,11 +441,10 @@
 		<div class="grid-lines"></div>
 	</div>
 
-	<main class="page-enter">
-		<!-- Header -->
+	<main class="page-main page-enter">
 		<div class="recap-header">
 			<h1 class="header-title">
-				<Trophy class="title-icon" />
+				<Trophy class="size-6 text-primary" />
 				Weekly Contributor Leaderboard
 			</h1>
 			<div class="nav-controls">
@@ -485,13 +484,12 @@
 			<small>Use <kbd>←</kbd> and <kbd>→</kbd> to navigate weeks</small>
 		</div>
 
-		<!-- Top stat cards -->
 		<section class="cards-section">
 			<div class="cards-grid">
-				<div class="card card-recap">
+				<div class="card card-week">
 					<div class="card-accent-bar"></div>
 					<div class="card-icon-row">
-						<div class="card-icon"><Calendar /></div>
+						<div class="card-icon"><Calendar class="size-5" /></div>
 					</div>
 					<div class="card-body">
 						<h2 class="card-title">Current Week</h2>
@@ -502,10 +500,10 @@
 						</p>
 					</div>
 				</div>
-				<div class="card card-deathbattle">
+				<div class="card card-contributors">
 					<div class="card-accent-bar"></div>
 					<div class="card-icon-row">
-						<div class="card-icon"><Users /></div>
+						<div class="card-icon"><Users class="size-5" /></div>
 					</div>
 					<div class="card-body">
 						<h2 class="card-title">Total Contributors</h2>
@@ -514,10 +512,12 @@
 						</p>
 					</div>
 				</div>
-				<div class="card card-resources">
+				<div class="card card-impact">
 					<div class="card-accent-bar"></div>
 					<div class="card-icon-row">
-						<div class="card-icon"><ChartColumn /></div>
+						<div class="card-icon">
+							<ChartColumn class="size-5" />
+						</div>
 					</div>
 					<div class="card-body">
 						<h2 class="card-title">Top 3's Impact</h2>
@@ -526,10 +526,10 @@
 						</p>
 					</div>
 				</div>
-				<div class="card card-wiki">
+				<div class="card card-average">
 					<div class="card-accent-bar"></div>
 					<div class="card-icon-row">
-						<div class="card-icon"><Activity /></div>
+						<div class="card-icon"><Activity class="size-5" /></div>
 					</div>
 					<div class="card-body">
 						<h2 class="card-title">Average per User</h2>
@@ -543,12 +543,11 @@
 
 		<div class="section-divider"></div>
 
-		<!-- Leaderboard -->
 		<section class="leaderboard-section">
 			<div class="card card-featured">
 				<div class="card-accent-bar"></div>
 				<div class="card-header">
-					<ListOrdered class="header-icon" />
+					<ListOrdered class="header-icon size-5" />
 					<h2 class="card-title mb-0">Leaderboard</h2>
 				</div>
 
@@ -561,23 +560,16 @@
 							</div>
 						{:else if errorMessage}
 							<div class="state-container error-state">
-								<TriangleAlert class="error-icon" />
+								<TriangleAlert class="size-5" />
 								<span>{errorMessage}</span>
 							</div>
 						{:else if recapData?.contributors.length === 0}
-							<div
-								class="flex flex-col items-center justify-center p-8 text-center"
-							>
+							<div class="empty-state">
 								<Inbox
-									class="mb-4 text-muted-foreground opacity-50"
-									size={48}
+									class="mb-4 size-12 text-muted-foreground opacity-50"
 								/>
-								<h5
-									class="text-muted-foreground font-semibold mb-1"
-								>
-									No contributors found
-								</h5>
-								<p class="text-muted-foreground text-sm m-0">
+								<h5>No contributors found</h5>
+								<p>
 									No contribution data available for this
 									week.
 								</p>
@@ -589,7 +581,7 @@
 										contributor.avatar,
 									)}
 								<button
-									class="leaderboard-item text-left flex items-center gap-4 w-full cursor-pointer hover:bg-muted/50 transition-colors border-b border-border p-4 last:border-0"
+									class="leaderboard-item"
 									onclick={() =>
 										window.open(
 											getUserProfileUrl(
@@ -599,19 +591,17 @@
 										)}
 								>
 									<div
-										class="leaderboard-rank flex shrink-0 justify-center items-center w-10 {i <
-										3
-											? `rank-${i + 1}`
-											: ''} font-bold text-lg"
+										class={[
+											"leaderboard-rank",
+											i < 3 && `rank-${i + 1}`,
+										]}
 									>
-										{#if i === 0}<Trophy
-												class="text-yellow-400"
-											/>
+										{#if i === 0}<Trophy class="size-5" />
 										{:else if i === 1}<Award
-												class="text-gray-400"
+												class="size-5"
 											/>
 										{:else if i === 2}<CircleStar
-												class="text-amber-600"
+												class="size-5"
 											/>
 										{:else}{i + 1}{/if}
 									</div>
@@ -619,7 +609,7 @@
 									<img
 										src={avatarUrl}
 										alt={contributor.userName}
-										class="contributor-avatar shrink-0 h-12 w-12 rounded-full border border-border object-cover"
+										class="contributor-avatar"
 										onerror={(e) => {
 											const el =
 												e.currentTarget as HTMLImageElement;
@@ -633,37 +623,27 @@
 										}}
 									/>
 
-									<div
-										class="contributor-info flex-1 min-w-0"
-									>
-										<h6
-											class="m-0 mb-1 text-foreground font-semibold truncate text-base"
-										>
+									<div class="contributor-info">
+										<h6>
 											{contributor.userName}
 											{#if contributor.isAdmin}
-												<span
-													class="admin-badge ms-2 px-2 py-0.5 text-[0.65rem] tracking-wider rounded font-bold bg-primary/10 text-primary"
+												<span class="admin-badge"
 													>Administrator</span
 												>
 											{/if}
 										</h6>
 										{#if contributor.userId && contributor.userId !== "N/A"}
-											<small
-												class="text-muted-foreground flex items-center text-xs"
-											>
+											<small>
 												<UserIcon
-													class="me-1"
-													size={12}
+													class="me-1 inline size-3"
 												/>
 												User ID: {contributor.userId}
 											</small>
 										{/if}
 									</div>
 
-									<div class="text-right shrink-0">
-										<div
-											class="contributions-count text-primary text-xl font-bold"
-										>
+									<div class="text-end">
+										<div class="contributions-count">
 											<span
 												use:countUp={contributor.contributions}
 												>0</span
@@ -679,9 +659,7 @@
 												</span>
 											{/if}
 										</div>
-										<small
-											class="text-muted-foreground contributions-text text-xs"
-										>
+										<small class="contributions-text">
 											contributions
 										</small>
 									</div>
@@ -1028,14 +1006,6 @@
 </div>
 
 <style>
-	main {
-		position: relative;
-		z-index: 1;
-		max-width: 1200px;
-		margin: 0 auto;
-		padding: 0 1.5rem 4rem;
-	}
-
 	.recap-header {
 		display: flex;
 		justify-content: space-between;
@@ -1045,8 +1015,14 @@
 		padding-bottom: 0.5rem;
 		position: sticky;
 		top: 0;
-		z-index: 10;
+		z-index: 17;
 		margin-bottom: 0.25rem;
+
+		@media (width < 48rem) {
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 1rem;
+		}
 	}
 
 	.header-title {
@@ -1058,10 +1034,10 @@
 		font-weight: 700;
 		color: var(--foreground);
 		margin: 0;
-	}
 
-	.title-icon {
-		color: var(--primary);
+		@media (width < 48rem) {
+			display: none;
+		}
 	}
 
 	.nav-controls {
@@ -1087,6 +1063,7 @@
 			opacity: 0.5;
 			cursor: not-allowed;
 		}
+
 		&:not(:disabled):hover {
 			background: var(--muted);
 		}
@@ -1096,11 +1073,21 @@
 		width: 16px;
 		height: 16px;
 	}
+
 	.show-mobile {
 		display: none;
+
+		@media (width < 37.5rem) {
+			display: inline;
+		}
 	}
+
 	.hide-mobile {
 		display: inline;
+
+		@media (width < 37.5rem) {
+			display: none;
+		}
 	}
 
 	.nav-hint {
@@ -1128,6 +1115,14 @@
 		display: grid;
 		gap: 1rem;
 		grid-template-columns: repeat(4, 1fr);
+
+		@media (width < 56.25rem) {
+			grid-template-columns: repeat(2, 1fr);
+		}
+
+		@media (width < 37.5rem) {
+			grid-template-columns: 1fr;
+		}
 	}
 
 	.card {
@@ -1152,23 +1147,27 @@
 			clip-path: polygon(100% 0, 0% 100%, 100% 100%);
 			opacity: 0.5;
 		}
-	}
 
-	.card-recap {
-		--card-accent: oklch(0.55 0.18 20);
-	}
-	.card-deathbattle {
-		--card-accent: oklch(0.55 0.15 60);
-	}
-	.card-resources {
-		--card-accent: oklch(0.5 0.1 220);
-	}
-	.card-wiki {
-		--card-accent: oklch(0.55 0.15 140);
-	}
-	.card-featured {
-		padding: 0;
-		--card-accent: oklch(0.55 0.18 20);
+		&.card-week {
+			--card-accent: oklch(0.55 0.18 20);
+		}
+
+		&.card-contributors {
+			--card-accent: oklch(0.55 0.15 60);
+		}
+
+		&.card-impact {
+			--card-accent: oklch(0.5 0.1 220);
+		}
+
+		&.card-average {
+			--card-accent: oklch(0.55 0.15 140);
+		}
+
+		&.card-featured {
+			padding: 0;
+			--card-accent: oklch(0.55 0.18 20);
+		}
 	}
 
 	.card-accent-bar {
@@ -1250,15 +1249,15 @@
 		padding: 3rem 1rem;
 		color: var(--muted-foreground);
 		gap: 1rem;
-	}
 
-	.error-state {
-		color: var(--destructive);
-		background: oklch(from var(--destructive) l c h / 0.1);
-		border-radius: 8px;
-		margin: 1rem;
-		padding: 1.5rem;
-		flex-direction: row;
+		&.error-state {
+			color: var(--destructive);
+			background: oklch(from var(--destructive) l c h / 0.1);
+			border-radius: 8px;
+			margin: 1rem;
+			padding: 1.5rem;
+			flex-direction: row;
+		}
 	}
 
 	.spinner {
@@ -1281,6 +1280,10 @@
 		gap: 1rem;
 		margin-bottom: 1rem;
 		flex-wrap: wrap;
+
+		@media (width < 48rem) {
+			gap: 0.5rem;
+		}
 	}
 
 	.summary-stat {
@@ -1297,6 +1300,7 @@
 		&.summary-stat-add .summary-val {
 			color: oklch(0.62 0.18 145);
 		}
+
 		&.summary-stat-rem .summary-val {
 			color: oklch(0.58 0.18 20);
 		}
@@ -1321,45 +1325,9 @@
 		display: grid;
 		grid-template-columns: 1fr 1fr;
 		gap: 1rem;
-	}
 
-	@media (max-width: 900px) {
-		.cards-grid {
-			grid-template-columns: repeat(2, 1fr);
-		}
-	}
-
-	@media (max-width: 768px) {
-		.recap-header {
-			flex-direction: column;
-			align-items: flex-start;
-			gap: 1rem;
-		}
-
-		.analytics-grid {
+		@media (width < 48rem) {
 			grid-template-columns: 1fr;
-		}
-
-		.analytics-summary {
-			gap: 0.5rem;
-		}
-
-		.header-title {
-			display: none;
-		}
-	}
-
-	@media (max-width: 600px) {
-		.cards-grid {
-			grid-template-columns: 1fr;
-		}
-
-		.hide-mobile {
-			display: none;
-		}
-
-		.show-mobile {
-			display: inline;
 		}
 	}
 </style>

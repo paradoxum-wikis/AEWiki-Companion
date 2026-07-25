@@ -14,11 +14,11 @@
 		Users,
 		Zap,
 	} from "@lucide/svelte";
-	import * as Card from "$lib/components/ui/card/index.js";
-	import { Button } from "$lib/components/ui/button/index.js";
+	import * as Card from "$lib/components/ui/card/index";
+	import { Button } from "$lib/components/ui/button/index";
 	import StatCard from "$lib/components/StatCard.svelte";
-	import { DeathBattleService } from "$lib/deathbattle/service.js";
-	import type { BattleStats, BattleRecord } from "../../types.js";
+	import { DeathBattleService } from "$lib/deathbattle/service";
+	import type { BattleStats, BattleRecord } from "../../types";
 
 	type Tab = "normal" | "ranked" | "records";
 	type Venue = "all" | "alter-ego" | "735394249863987241";
@@ -180,11 +180,11 @@
 		<div class="grid-lines"></div>
 	</div>
 
-	<main class="page-enter">
+	<main class="page-main page-enter">
 		<header class="page-header">
 			<div>
 				<h1>
-					<Zap class="title-icon" />
+					<Zap class="size-7 text-primary" />
 					Deathbattle Statistics
 				</h1>
 				<p>
@@ -201,7 +201,7 @@
 				role="tab"
 				aria-selected={activeTab === "normal"}
 			>
-				<Zap class="tab-icon" />
+				<Zap class="size-4" />
 				Normal Battles
 			</button>
 			<button
@@ -210,7 +210,7 @@
 				role="tab"
 				aria-selected={activeTab === "ranked"}
 			>
-				<Trophy class="tab-icon" />
+				<Trophy class="size-4" />
 				Ranked Battles
 			</button>
 			<button
@@ -219,7 +219,7 @@
 				role="tab"
 				aria-selected={activeTab === "records"}
 			>
-				<RotateCw class="tab-icon" />
+				<RotateCw class="size-4" />
 				Battle Records
 			</button>
 		</nav>
@@ -641,36 +641,24 @@
 </div>
 
 <style>
-	main {
-		position: relative;
-		z-index: 1;
-		max-width: 1200px;
-		margin: 0 auto;
-		padding: 0 1.5rem 4rem;
-	}
-
 	.page-header {
 		padding: 2rem 0 1.5rem;
-	}
 
-	.page-header h1 {
-		display: flex;
-		align-items: center;
-		gap: 0.75rem;
-		margin: 0 0 0.5rem;
-		font-family: var(--font-heading);
-		font-size: 1.75rem;
-		font-weight: 700;
-		color: var(--foreground);
-	}
+		h1 {
+			display: flex;
+			align-items: center;
+			gap: 0.75rem;
+			margin: 0 0 0.5rem;
+			font-family: var(--font-heading);
+			font-size: 1.75rem;
+			font-weight: 700;
+			color: var(--foreground);
+		}
 
-	.page-header h1 :global(svg) {
-		color: var(--primary);
-	}
-
-	.page-header p {
-		margin: 0;
-		color: var(--muted-foreground);
+		p {
+			margin: 0;
+			color: var(--muted-foreground);
+		}
 	}
 
 	.tab-nav {
@@ -678,39 +666,34 @@
 		gap: 0.5rem;
 		margin-bottom: 1.5rem;
 		flex-wrap: wrap;
-	}
 
-	.tab-nav button {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.5rem;
-		padding: 0.65rem 1rem;
-		border: 1px solid var(--border);
-		border-radius: 0.75rem;
-		background: var(--card);
-		color: var(--muted-foreground);
-		font-size: 0.9rem;
-		font-weight: 600;
-		transition:
-			border-color 0.2s,
-			background 0.2s,
-			color 0.2s;
-	}
+		button {
+			display: inline-flex;
+			align-items: center;
+			gap: 0.5rem;
+			padding: 0.65rem 1rem;
+			border: 1px solid var(--border);
+			border-radius: 0.75rem;
+			background: var(--card);
+			color: var(--muted-foreground);
+			font-size: 0.9rem;
+			font-weight: 600;
+			transition:
+				border-color 0.2s,
+				background 0.2s,
+				color 0.2s;
 
-	.tab-nav button :global(svg) {
-		width: 0.95rem;
-		height: 0.95rem;
-	}
+			&:hover {
+				background: var(--muted);
+				color: var(--foreground);
+			}
 
-	.tab-nav button:hover {
-		background: var(--muted);
-		color: var(--foreground);
-	}
-
-	.tab-nav button.active {
-		background: var(--primary);
-		border-color: var(--primary);
-		color: var(--primary-foreground);
+			&.active {
+				background: var(--primary);
+				border-color: var(--primary);
+				color: var(--primary-foreground);
+			}
+		}
 	}
 
 	.tab-panel {
@@ -722,6 +705,10 @@
 		display: grid;
 		grid-template-columns: repeat(3, 1fr);
 		gap: 1rem;
+
+		@media (width < 56.25rem) {
+			grid-template-columns: 1fr;
+		}
 	}
 
 	.state-container {
@@ -732,15 +719,15 @@
 		padding: 3rem 1rem;
 		gap: 1rem;
 		color: var(--muted-foreground);
-	}
 
-	.error-state {
-		flex-direction: row;
-		background: color-mix(in oklab, var(--destructive) 10%, transparent);
-		border-radius: 0.85rem;
-		margin: 1rem;
-		padding: 1.5rem;
-		color: var(--destructive);
+		&.error-state {
+			flex-direction: row;
+			background: color-mix(in oklab, var(--destructive) 10%, transparent);
+			border-radius: 0.85rem;
+			margin: 1rem;
+			padding: 1.5rem;
+			color: var(--destructive);
+		}
 	}
 
 	.leaderboard-list,
@@ -754,10 +741,14 @@
 		gap: 1rem;
 		padding: 1rem 1.5rem;
 		border-bottom: 1px solid var(--border);
-	}
 
-	.leaderboard-item:last-child {
-		border-bottom: none;
+		&:last-child {
+			border-bottom: none;
+		}
+
+		@media (width < 40rem) {
+			flex-wrap: wrap;
+		}
 	}
 
 	.rank-badge {
@@ -770,10 +761,10 @@
 		font-size: 1.1rem;
 		flex-shrink: 0;
 		color: var(--muted-foreground);
-	}
 
-	.rank-badge.top3 {
-		font-size: 1.3rem;
+		&.top3 {
+			font-size: 1.3rem;
+		}
 	}
 
 	.player-info {
@@ -796,6 +787,14 @@
 	.battle-stats {
 		text-align: right;
 		flex-shrink: 0;
+
+		@media (width < 40rem) {
+			width: 100%;
+			text-align: left;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
 	}
 
 	.record-row {
@@ -818,18 +817,18 @@
 		font-weight: 800;
 		font-size: 1.1rem;
 		font-family: var(--font-heading);
-	}
 
-	.score.high {
-		color: oklch(0.62 0.18 145);
-	}
+		&.high {
+			color: oklch(0.62 0.18 145);
+		}
 
-	.score.mid {
-		color: oklch(0.65 0.14 85);
-	}
+		&.mid {
+			color: oklch(0.65 0.14 85);
+		}
 
-	.score.low {
-		color: oklch(0.58 0.18 20);
+		&.low {
+			color: oklch(0.58 0.18 20);
+		}
 	}
 
 	.aux {
@@ -847,7 +846,7 @@
 	.venue-pill {
 		padding: 0.4rem 0.75rem;
 		border: 1px solid var(--border);
-		border-radius: 999px;
+		border-radius: 0.375rem;
 		background: var(--background);
 		color: var(--muted-foreground);
 		font-size: 0.8rem;
@@ -856,26 +855,26 @@
 			border-color 0.2s,
 			background 0.2s,
 			color 0.2s;
-	}
 
-	.venue-pill:hover {
-		background: var(--muted);
-		color: var(--foreground);
-	}
+		&:hover {
+			background: var(--muted);
+			color: var(--foreground);
+		}
 
-	.venue-pill.active {
-		background: var(--primary);
-		border-color: var(--primary);
-		color: var(--primary-foreground);
+		&.active {
+			background: var(--primary);
+			border-color: var(--primary);
+			color: var(--primary-foreground);
+		}
 	}
 
 	.record-item {
 		padding: 1rem 1.5rem;
 		border-bottom: 1px solid var(--border);
-	}
 
-	.record-item:last-child {
-		border-bottom: none;
+		&:last-child {
+			border-bottom: none;
+		}
 	}
 
 	.record-header {
@@ -903,17 +902,17 @@
 
 	.type-badge {
 		padding: 0.3rem 0.65rem;
-		border-radius: 999px;
+		border-radius: 0.375rem;
 		background: var(--muted);
 		color: var(--foreground);
 		font-size: 0.75rem;
 		font-weight: 700;
 		white-space: nowrap;
-	}
 
-	.type-badge.ranked {
-		background: oklch(0.95 0.04 90);
-		color: oklch(0.55 0.14 85);
+		&.ranked {
+			background: oklch(0.95 0.04 90);
+			color: oklch(0.55 0.14 85);
+		}
 	}
 
 	.record-meta {
@@ -941,6 +940,11 @@
 		gap: 1rem;
 		padding: 1rem 1.5rem;
 		border-top: 1px solid var(--border);
+
+		@media (width < 56.25rem) {
+			flex-direction: column;
+			align-items: stretch;
+		}
 	}
 
 	.pagination-info {
@@ -949,15 +953,15 @@
 		gap: 0.5rem;
 		font-size: 0.85rem;
 		color: var(--muted-foreground);
-	}
 
-	.pagination-info select {
-		padding: 0.3rem 0.6rem;
-		border: 1px solid var(--border);
-		border-radius: 0.5rem;
-		background: var(--background);
-		color: var(--foreground);
-		font-size: 0.85rem;
+		select {
+			padding: 0.3rem 0.6rem;
+			border: 1px solid var(--border);
+			border-radius: 0.5rem;
+			background: var(--background);
+			color: var(--foreground);
+			font-size: 0.85rem;
+		}
 	}
 
 	.pagination-status {
@@ -969,6 +973,10 @@
 		display: flex;
 		align-items: center;
 		gap: 0.35rem;
+
+		@media (width < 56.25rem) {
+			justify-content: center;
+		}
 	}
 
 	.page-indicator {
@@ -976,39 +984,5 @@
 		font-size: 0.85rem;
 		font-weight: 600;
 		color: var(--foreground);
-	}
-
-	@media (max-width: 900px) {
-		.stat-grid {
-			grid-template-columns: 1fr;
-		}
-
-		.pagination {
-			flex-direction: column;
-			align-items: stretch;
-		}
-
-		.pagination-controls {
-			justify-content: center;
-		}
-	}
-
-	@media (max-width: 640px) {
-		main {
-			padding-left: 1rem;
-			padding-right: 1rem;
-		}
-
-		.leaderboard-item {
-			flex-wrap: wrap;
-		}
-
-		.battle-stats {
-			width: 100%;
-			text-align: left;
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
-		}
 	}
 </style>

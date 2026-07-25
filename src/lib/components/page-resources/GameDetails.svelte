@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { ChevronDown, ExternalLink, Info } from "@lucide/svelte";
-	import * as Card from "$lib/components/ui/card/index.js";
-	import type { GameDataCache } from "../../../modules/types.js";
+	import * as Card from "$lib/components/ui/card/index";
+	import type { GameDataCache } from "$lib/page-resources/types";
 	import {
 		formatArray,
 		formatBoolean,
 		formatDate,
 		formatNumber,
-	} from "../../../modules/formatter.js";
+	} from "$lib/page-resources/formatter";
 
 	type DetailRow = {
 		label: string;
@@ -283,11 +283,13 @@
 
 			<div class="details-stack">
 				{#each detailSections as section, index}
-					<details class="detail-group" open={index === 0}>
+					<details class="detail-group group" open={index === 0}>
 						<summary>
 							<span>{section.title}</span>
 							<span class="summary-chevron">
-								<ChevronDown class="size-3.5 shrink-0" />
+								<ChevronDown
+									class="size-3.5 shrink-0 transition-transform duration-200 group-open:rotate-180"
+								/>
 							</span>
 						</summary>
 						<dl>
@@ -385,12 +387,8 @@
 		}
 	}
 
-	.summary-chevron :global(svg) {
-		transition: transform 0.2s ease;
-	}
-
-	details[open] .summary-chevron :global(svg) {
-		transform: rotate(180deg);
+	.summary-chevron {
+		display: inline-flex;
 	}
 
 	dl {

@@ -51,12 +51,10 @@
 		name="twitter:image:alt"
 		content="ALTER EGO Wiki - Join our community"
 	/>
-
 	<link rel="canonical" href="https://ae.tds-editor.com/" />
 </svelte:head>
 
 <div class="page-root">
-	<!-- Background mesh -->
 	<div class="bg-mesh" aria-hidden="true">
 		<div class="mesh-orb orb-1"></div>
 		<div class="mesh-orb orb-2"></div>
@@ -64,26 +62,21 @@
 		<div class="grid-lines"></div>
 	</div>
 
-	<main>
-		<!-- Hero -->
+	<main class="page-main">
 		<section class="hero">
 			<h1 class="hero-title">
 				<span class="hero-title-line1">Welcome,</span>
 				<span class="hero-title-line2">Alter Egoist</span>
 			</h1>
-
 			<p class="hero-sub">
 				To the companio! For the more quirky things of ALTER EGO Wiki
 				and Tower Defense Simulator Wiki!.<br />(/▿＼)
 			</p>
 		</section>
 
-		<!-- Main grid -->
 		<section class="cards-section">
 			<div class="section-label">Balderdash</div>
-
 			<div class="cards-grid">
-				<!-- Weekly Recap -->
 				<a
 					href="/recap/"
 					class="card card-featured card-recap"
@@ -91,9 +84,7 @@
 				>
 					<div class="card-accent-bar"></div>
 					<div class="card-icon-row">
-						<div class="card-icon">
-							<Trophy />
-						</div>
+						<div class="card-icon"><Trophy class="size-5" /></div>
 					</div>
 					<div class="card-body">
 						<h2 class="card-title">Weekly Recap</h2>
@@ -104,12 +95,11 @@
 					</div>
 					<div class="card-footer">
 						<span class="card-link"
-							>Browse Tool<ArrowRight class="link-icon" /></span
+							>Browse Tool<ArrowRight class="size-3.5" /></span
 						>
 					</div>
 				</a>
 
-				<!-- Deathbattle -->
 				<a
 					href="/deathbattle/"
 					class="card card-deathbattle"
@@ -117,9 +107,7 @@
 				>
 					<div class="card-accent-bar"></div>
 					<div class="card-icon-row">
-						<div class="card-icon">
-							<Zap />
-						</div>
+						<div class="card-icon"><Zap class="size-5" /></div>
 					</div>
 					<div class="card-body">
 						<h2 class="card-title">Deathbattle Stats</h2>
@@ -130,12 +118,11 @@
 					</div>
 					<div class="card-footer">
 						<span class="card-link"
-							>Browse Tool<ArrowRight class="link-icon" /></span
+							>Browse Tool<ArrowRight class="size-3.5" /></span
 						>
 					</div>
 				</a>
 
-				<!-- Page Resources -->
 				<a
 					href="/page-resources/"
 					class="card card-resources"
@@ -143,9 +130,7 @@
 				>
 					<div class="card-accent-bar"></div>
 					<div class="card-icon-row">
-						<div class="card-icon">
-							<Wrench />
-						</div>
+						<div class="card-icon"><Wrench class="size-5" /></div>
 					</div>
 					<div class="card-body">
 						<h2 class="card-title">Page Resources</h2>
@@ -156,12 +141,11 @@
 					</div>
 					<div class="card-footer">
 						<span class="card-link"
-							>Browse Tool<ArrowRight class="link-icon" /></span
+							>Browse Tool<ArrowRight class="size-3.5" /></span
 						>
 					</div>
 				</a>
 
-				<!-- ALTERPEDIA -->
 				<a
 					href="https://alter-ego.fandom.com/wiki/"
 					target="_blank"
@@ -171,9 +155,7 @@
 				>
 					<div class="card-accent-bar"></div>
 					<div class="card-icon-row">
-						<div class="card-icon">
-							<Book />
-						</div>
+						<div class="card-icon"><Book class="size-5" /></div>
 						<div class="card-badge">Fandom</div>
 					</div>
 					<div class="card-body">
@@ -184,12 +166,11 @@
 					</div>
 					<div class="card-footer">
 						<span class="card-link"
-							>Visit Wiki<ExternalLink class="link-icon" /></span
+							>Visit Wiki<ExternalLink class="size-3.5" /></span
 						>
 					</div>
 				</a>
 
-				<!-- TDS Wiki -->
 				<a
 					href="https://tds.fandom.com/wiki/"
 					target="_blank"
@@ -199,9 +180,7 @@
 				>
 					<div class="card-accent-bar"></div>
 					<div class="card-icon-row">
-						<div class="card-icon">
-							<Book />
-						</div>
+						<div class="card-icon"><Book class="size-5" /></div>
 						<div class="card-badge">Fandom</div>
 					</div>
 					<div class="card-body">
@@ -212,12 +191,11 @@
 					</div>
 					<div class="card-footer">
 						<span class="card-link"
-							>Visit Wiki<ExternalLink class="link-icon" /></span
+							>Visit Wiki<ExternalLink class="size-3.5" /></span
 						>
 					</div>
 				</a>
 
-				<!-- X page -->
 				<a
 					href="https://x.com/isALTEREGOout"
 					target="_blank"
@@ -228,7 +206,7 @@
 					<div class="card-accent-bar"></div>
 					<div class="card-icon-row">
 						<div class="card-icon">
-							<MessageCircle />
+							<MessageCircle class="size-5" />
 						</div>
 						<div class="card-badge">X</div>
 					</div>
@@ -241,12 +219,11 @@
 					</div>
 					<div class="card-footer">
 						<span class="card-link"
-							>Follow Us<ExternalLink class="link-icon" /></span
+							>Follow Us<ExternalLink class="size-3.5" /></span
 						>
 					</div>
 				</a>
 
-				<!-- AE Before -->
 				<a
 					href="https://aeb.tds-editor.com/"
 					target="_blank"
@@ -256,9 +233,7 @@
 				>
 					<div class="card-accent-bar"></div>
 					<div class="card-icon-row">
-						<div class="card-icon">
-							<Gamepad2 />
-						</div>
+						<div class="card-icon"><Gamepad2 class="size-5" /></div>
 					</div>
 					<div class="card-body">
 						<h2 class="card-title">ALTER EGO: Before</h2>
@@ -269,14 +244,13 @@
 					</div>
 					<div class="card-footer">
 						<span class="card-link"
-							>Play Demo<ExternalLink class="link-icon" /></span
+							>Play Demo<ExternalLink class="size-3.5" /></span
 						>
 					</div>
 				</a>
 			</div>
 		</section>
 
-		<!-- Discord -->
 		<section class="discord-section">
 			<div class="section-label">Community</div>
 			<div class="discord-layout">
@@ -290,25 +264,27 @@
 					<ul class="discord-perks">
 						<li>What's in there, you may ask? Well, we got:</li>
 						<li>
-							&nbsp;<span class="perk-dot"></span> A welcoming community..!
+							<span class="perk-dot"></span> A welcoming
+							community..!
 						</li>
 						<li>
-							&nbsp;<span class="perk-dot"></span> General tomfoolery...
+							<span class="perk-dot"></span> General
+							tomfoolery...
 						</li>
 						<li>
-							&nbsp;<span class="perk-dot"></span> A lot of crackpot
+							<span class="perk-dot"></span> A lot of crackpot
 							theories...
 						</li>
 						<li>
-							&nbsp;<span class="perk-dot"></span> Random people getting
+							<span class="perk-dot"></span> Random people getting
 							beaten up...
 						</li>
 						<li>
-							&nbsp;<span class="perk-dot"></span> Ocassional philosophical
-							discussions!
+							<span class="perk-dot"></span> Ocassional
+							philosophical discussions!
 						</li>
 						<li>
-							&nbsp;<span class="perk-dot"></span> The most recent news
+							<span class="perk-dot"></span> The most recent news
 							for ALTER EGO, of course!
 						</li>
 					</ul>
@@ -319,134 +295,11 @@
 	</main>
 </div>
 
-<style lang="scss">
-	.page-root {
-		min-height: 100vh;
-		position: relative;
-		overflow-x: hidden;
-	}
-
-	.bg-mesh {
-		position: fixed;
-		inset: 0;
-		pointer-events: none;
-		z-index: 0;
-		overflow: hidden;
-	}
-
-	.mesh-orb {
-		position: absolute;
-		border-radius: 50%;
-		filter: blur(80px);
-		opacity: 0.15;
-	}
-
-	.orb-1 {
-		width: 600px;
-		height: 600px;
-		top: -200px;
-		right: -100px;
-		background: radial-gradient(
-			circle,
-			oklch(0.45 0.18 20),
-			transparent 70%
-		);
-		animation: drift1 18s ease-out infinite alternate;
-	}
-
-	.orb-2 {
-		width: 500px;
-		height: 500px;
-		bottom: 0;
-		left: -150px;
-		background: radial-gradient(
-			circle,
-			oklch(0.35 0.12 30),
-			transparent 70%
-		);
-		animation: drift2 22s ease-out infinite alternate;
-	}
-
-	.orb-3 {
-		width: 400px;
-		height: 400px;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
-		background: radial-gradient(
-			circle,
-			oklch(0.4 0.08 350),
-			transparent 70%
-		);
-		animation: drift3 26s ease-out infinite alternate;
-		opacity: 0.08;
-	}
-
-	@keyframes drift1 {
-		from {
-			transform: translate(0, 0);
-		}
-		to {
-			transform: translate(-40px, 60px);
-		}
-	}
-	@keyframes drift2 {
-		from {
-			transform: translate(0, 0);
-		}
-		to {
-			transform: translate(60px, -40px);
-		}
-	}
-	@keyframes drift3 {
-		from {
-			transform: translate(-50%, -50%) scale(1);
-		}
-		to {
-			transform: translate(-50%, -50%) scale(1.15);
-		}
-	}
-
-	.grid-lines {
-		position: absolute;
-		inset: 0;
-		background-image:
-			linear-gradient(
-				to right,
-				oklch(0.5 0.02 35 / 0.04) 1px,
-				transparent 1px
-			),
-			linear-gradient(
-				to bottom,
-				oklch(0.5 0.02 35 / 0.04) 1px,
-				transparent 1px
-			);
-		background-size: 60px 60px;
-	}
-
-	main {
-		position: relative;
-		z-index: 1;
-		max-width: 1200px;
-		margin: 0 auto;
-		padding: 0 1.5rem 4rem;
-	}
-
+<style>
 	.hero {
 		text-align: center;
 		padding: 5rem 1rem 1.5rem;
 		animation: fadeUp 0.7s ease-out both;
-	}
-
-	@keyframes fadeUp {
-		from {
-			opacity: 0;
-			transform: translateY(24px);
-		}
-		to {
-			opacity: 1;
-			transform: translateY(0);
-		}
 	}
 
 	.hero-title {
@@ -498,30 +351,6 @@
 		line-height: 1.6;
 	}
 
-	.section-label {
-		font-size: 0.68rem;
-		font-weight: 700;
-		letter-spacing: 0.18em;
-		text-transform: uppercase;
-		color: var(--primary);
-		margin-bottom: 1.5rem;
-		display: flex;
-		align-items: center;
-		gap: 0.75rem;
-
-		&::before,
-		&::after {
-			content: "";
-			flex: 1;
-			height: 1px;
-			background: var(--border);
-		}
-
-		&::before {
-			max-width: 2rem;
-		}
-	}
-
 	.cards-section {
 		margin-bottom: 4rem;
 		animation: fadeUp 0.7s ease-out 0.15s both;
@@ -530,23 +359,21 @@
 	.cards-grid {
 		display: grid;
 		grid-template-columns: repeat(3, 1fr);
-		grid-template-rows: auto auto;
 		gap: 1rem;
-	}
 
-	.card-featured {
-		grid-column: span 2;
-	}
+		@media (width < 56.25rem) {
+			grid-template-columns: repeat(2, 1fr);
+		}
 
-	.card-game {
-		grid-column: span 2;
+		@media (width < 37.5rem) {
+			grid-template-columns: 1fr;
+		}
 	}
 
 	.card {
 		position: relative;
 		display: flex;
 		flex-direction: column;
-		gap: 0;
 		padding: 1.5rem;
 		border-radius: 12px;
 		border: 1px solid var(--border);
@@ -567,8 +394,19 @@
 				0 12px 40px oklch(0 0 0 / 0.15),
 				0 0 0 1px var(--card-accent);
 			border-color: var(--card-accent);
-			text-decoration: none;
 			color: var(--card-foreground);
+
+			.card-accent-bar {
+				opacity: 1;
+			}
+
+			.card-icon {
+				background: oklch(from var(--card-accent) l c h / 0.2);
+			}
+
+			.card-link {
+				gap: 0.5rem;
+			}
 		}
 
 		&::after {
@@ -582,25 +420,47 @@
 			clip-path: polygon(100% 0, 0% 100%, 100% 100%);
 			opacity: 0.5;
 		}
-	}
 
-	.card-recap {
-		--card-accent: oklch(0.55 0.18 20);
-	}
-	.card-deathbattle {
-		--card-accent: oklch(0.55 0.15 60);
-	}
-	.card-resources {
-		--card-accent: oklch(0.5 0.1 220);
-	}
-	.card-wiki {
-		--card-accent: oklch(0.55 0.15 140);
-	}
-	.card-twitter {
-		--card-accent: oklch(0.55 0.05 220);
-	}
-	.card-game {
-		--card-accent: oklch(0.55 0.15 300);
+		&.card-featured {
+			grid-column: span 2;
+
+			.card-title {
+				font-size: 1.4rem;
+			}
+
+			@media (width < 37.5rem) {
+				grid-column: span 1;
+			}
+		}
+
+		&.card-game {
+			grid-column: span 2;
+			--card-accent: oklch(0.55 0.15 300);
+
+			@media (width < 37.5rem) {
+				grid-column: span 1;
+			}
+		}
+
+		&.card-recap {
+			--card-accent: oklch(0.55 0.18 20);
+		}
+
+		&.card-deathbattle {
+			--card-accent: oklch(0.55 0.15 60);
+		}
+
+		&.card-resources {
+			--card-accent: oklch(0.5 0.1 220);
+		}
+
+		&.card-wiki {
+			--card-accent: oklch(0.55 0.15 140);
+		}
+
+		&.card-twitter {
+			--card-accent: oklch(0.55 0.05 220);
+		}
 	}
 
 	.card-accent-bar {
@@ -618,10 +478,6 @@
 		);
 		opacity: 0;
 		transition: opacity 0.25s;
-
-		.card:hover & {
-			opacity: 1;
-		}
 	}
 
 	.card-icon-row {
@@ -642,10 +498,6 @@
 		color: var(--card-accent);
 		transition: background 0.2s;
 		flex-shrink: 0;
-
-		.card:hover & {
-			background: oklch(from var(--card-accent) l c h / 0.2);
-		}
 	}
 
 	.card-badge {
@@ -670,10 +522,6 @@
 		font-family: var(--font-heading);
 		letter-spacing: -0.01em;
 		line-height: 1.2;
-
-		.card-featured & {
-			font-size: 1.4rem;
-		}
 	}
 
 	.card-desc {
@@ -697,16 +545,6 @@
 		font-weight: 600;
 		color: var(--card-accent);
 		transition: gap 0.2s;
-
-		.card:hover & {
-			gap: 0.5rem;
-		}
-	}
-
-	:global(.link-icon) {
-		width: 14px;
-		height: 14px;
-		flex-shrink: 0;
 	}
 
 	.discord-section {
@@ -718,6 +556,11 @@
 		grid-template-columns: 1fr 1fr;
 		gap: 3rem;
 		align-items: start;
+
+		@media (width < 56.25rem) {
+			grid-template-columns: 1fr;
+			gap: 2rem;
+		}
 	}
 
 	.discord-heading {
@@ -759,32 +602,5 @@
 		border-radius: 50%;
 		background: var(--primary);
 		flex-shrink: 0;
-	}
-
-	@media (max-width: 900px) {
-		.cards-grid {
-			grid-template-columns: repeat(2, 1fr);
-		}
-
-		.card-featured,
-		.card-game {
-			grid-column: span 2;
-		}
-
-		.discord-layout {
-			grid-template-columns: 1fr;
-			gap: 2rem;
-		}
-	}
-
-	@media (max-width: 600px) {
-		.cards-grid {
-			grid-template-columns: 1fr;
-		}
-
-		.card-featured,
-		.card-game {
-			grid-column: span 1;
-		}
 	}
 </style>

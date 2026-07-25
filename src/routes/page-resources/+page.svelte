@@ -6,11 +6,11 @@
 		ExternalLink,
 		Settings2,
 	} from "@lucide/svelte";
-	import * as Card from "$lib/components/ui/card/index.js";
-	import { RobloxApiService } from "../../modules/service.js";
-	import { getFromCache, saveToCache } from "../../modules/cacheManage.js";
-	import { getCachedImageUrl } from "../../modules/imageCache.js";
-	import type { GameDataCache, GameType } from "../../modules/types.js";
+	import * as Card from "$lib/components/ui/card/index";
+	import { RobloxApiService } from "$lib/page-resources/service";
+	import { getFromCache, saveToCache } from "$lib/page-resources/cacheManage";
+	import { getCachedImageUrl } from "$lib/page-resources/imageCache";
+	import type { GameDataCache, GameType } from "$lib/page-resources/types";
 	import GameSwitcher from "$lib/components/page-resources/GameSwitcher.svelte";
 	import Gallery from "$lib/components/page-resources/Gallery.svelte";
 	import GameDetails from "$lib/components/page-resources/GameDetails.svelte";
@@ -223,7 +223,7 @@
 		<div class="grid-lines"></div>
 	</div>
 
-	<main class="page-enter">
+	<main class="page-main page-enter">
 		<HeroSection {currentGame} />
 
 		<section class="utility-shell">
@@ -236,11 +236,11 @@
 
 		{#if error}
 			<div class="status-shell">
-				<Card.Root>
-					<Card.Content>
+				<Card.Root class="status-card">
+					<Card.Content class="p-5">
 						<div class="status-copy">
 							<div class="status-icon error">
-								<TriangleAlert />
+								<TriangleAlert class="size-5" />
 							</div>
 							<div>
 								<h2>Unable to load page resources</h2>
@@ -320,38 +320,6 @@
 </div>
 
 <style>
-	main {
-		position: relative;
-		z-index: 1;
-		max-width: 1200px;
-		margin: 0 auto;
-		padding: 0 1.5rem 4rem;
-	}
-
-	.section-label {
-		font-size: 0.68rem;
-		font-weight: 700;
-		letter-spacing: 0.18em;
-		text-transform: uppercase;
-		color: var(--primary);
-		margin-bottom: 1rem;
-		display: flex;
-		align-items: center;
-		gap: 0.75rem;
-
-		&::before,
-		&::after {
-			content: "";
-			flex: 1;
-			height: 1px;
-			background: var(--border);
-		}
-	}
-
-	.section-label::before {
-		max-width: 2rem;
-	}
-
 	.utility-shell,
 	.content-shell {
 		margin-top: 2rem;
@@ -368,36 +336,33 @@
 		margin-top: 1.5rem;
 	}
 
-	:global(.status-shell [data-slot="card"]) {
+	:global(.status-card) {
 		background: color-mix(in oklab, var(--destructive) 9%, var(--card));
-		border-color: color-mix(
-			in oklab,
-			var(--destructive) 35%,
-			var(--border)
-		);
-	}
-
-	:global(.status-shell [data-slot="card-content"]) {
-		padding: 1.25rem 1.5rem;
+		border-color: color-mix(in oklab, var(--destructive) 35%, var(--border));
 	}
 
 	.status-copy {
 		display: flex;
 		align-items: flex-start;
 		gap: 1rem;
-	}
 
-	.status-copy h2 {
-		margin: 0 0 0.3rem;
-		font-size: 1rem;
-		font-weight: 700;
-		color: var(--foreground);
-	}
+		h2 {
+			margin: 0 0 0.3rem;
+			font-size: 1rem;
+			font-weight: 700;
+			color: var(--foreground);
+		}
 
-	.status-copy p {
-		margin: 0;
-		color: var(--muted-foreground);
-		line-height: 1.6;
+		p {
+			margin: 0;
+			color: var(--muted-foreground);
+			line-height: 1.6;
+		}
+
+		@media (width < 40rem) {
+			flex-direction: column;
+			align-items: flex-start;
+		}
 	}
 
 	.meta-grid {
@@ -417,12 +382,12 @@
 		margin: 0;
 		line-height: 1.65;
 		color: var(--muted-foreground);
-	}
 
-	.info-copy a {
-		color: var(--foreground);
-		text-decoration: none;
-		font-weight: 600;
+		a {
+			color: var(--foreground);
+			text-decoration: none;
+			font-weight: 600;
+		}
 	}
 
 	.status-icon {
@@ -433,39 +398,27 @@
 		align-items: center;
 		justify-content: center;
 		flex-shrink: 0;
+
+		&.error {
+			background: color-mix(in oklab, var(--destructive) 18%, transparent);
+			color: var(--destructive);
+		}
+
+		&.warning {
+			background: oklch(0.95 0.04 90);
+			color: oklch(0.55 0.14 85);
+		}
+
+		&.neutral {
+			background: var(--muted);
+			color: var(--foreground);
+		}
 	}
 
-	.status-icon.error {
-		background: color-mix(in oklab, var(--destructive) 18%, transparent);
-		color: var(--destructive);
-	}
-
-	.status-icon.warning {
-		background: oklch(0.95 0.04 90);
-		color: oklch(0.55 0.14 85);
-	}
-
-	.status-icon.neutral {
-		background: var(--muted);
-		color: var(--foreground);
-	}
-
-	@media (max-width: 900px) {
+	@media (width < 56.25rem) {
 		.utility-grid,
 		.meta-grid {
 			grid-template-columns: 1fr;
-		}
-	}
-
-	@media (max-width: 640px) {
-		main {
-			padding-left: 1rem;
-			padding-right: 1rem;
-		}
-
-		.status-copy {
-			flex-direction: column;
-			align-items: flex-start;
 		}
 	}
 </style>

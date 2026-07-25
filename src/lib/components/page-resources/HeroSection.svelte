@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { Sparkles } from "@lucide/svelte";
-	import type { GameType } from "../../../modules/types.js";
+	import type { GameType } from "$lib/page-resources/types";
 
 	let { currentGame }: { currentGame: GameType } = $props();
 
@@ -33,11 +32,7 @@
 	style:background-image={`linear-gradient(135deg, rgb(8 8 12 / 0.82), rgb(8 8 12 / 0.48)), url('${gameInfo[currentGame].backgroundImage}')`}
 >
 	<div class="hero-copy">
-		<div class="hero-pill">
-			<Sparkles class="size-4 shrink-0" />
-			<span>{gameInfo[currentGame].eyebrow}</span>
-		</div>
-
+		<p class="hero-eyebrow">{gameInfo[currentGame].eyebrow}</p>
 		<h1>{gameInfo[currentGame].title}</h1>
 		<p>{gameInfo[currentGame].subtitle}</p>
 	</div>
@@ -58,38 +53,33 @@
 
 	.hero-copy {
 		position: relative;
-		z-index: 1;
+		z-index: 7;
 	}
 
-	.hero-pill {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.5rem;
-		padding: 0.45rem 0.8rem;
-		border-radius: 999px;
-		margin-bottom: 1rem;
-		background: rgb(255 255 255 / 0.12);
-		color: rgb(255 255 255 / 0.92);
+	.hero-eyebrow {
+		margin: 0 0 0.75rem;
+		color: rgb(255 255 255 / 0.72);
 		font-size: 0.78rem;
 		font-weight: 700;
-		letter-spacing: 0.04em;
-		backdrop-filter: blur(8px);
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
 	}
 
 	h1 {
 		margin: 0 0 0.75rem;
-		font-size: clamp(2rem, 5vw, 3.6rem);
-		line-height: 1.05;
-		font-family: var(--font-heading);
 		color: white;
-		font-weight: bold;
+		font-family: var(--font-heading);
+		font-size: clamp(1.75rem, 4vw, 2.5rem);
+		font-weight: 800;
+		letter-spacing: -0.02em;
+		line-height: 1.1;
 	}
 
-	p {
+	p:not(.hero-eyebrow) {
 		margin: 0;
-		max-width: 38rem;
-		font-size: 1rem;
-		line-height: 1.7;
+		max-width: 36rem;
 		color: rgb(255 255 255 / 0.82);
+		font-size: 1rem;
+		line-height: 1.55;
 	}
 </style>

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Download, Image, Images, Info } from "@lucide/svelte";
-	import * as Card from "$lib/components/ui/card/index.js";
-	import { downloadImage } from "../../../modules/downloader.js";
+	import * as Card from "$lib/components/ui/card/index";
+	import { downloadImage } from "$lib/page-resources/downloader";
 
 	let {
 		gameIconUrl,
@@ -51,10 +51,10 @@
 
 <div class="gallery-grid">
 	<Card.Root class="icon-card">
-		<Card.Header>
+		<Card.Header class="flex flex-row items-start justify-between gap-4">
 			<div class="tds-inline-title">
 				<div class="tds-icon-well tds-icon-well--accent">
-					<Image />
+					<Image class="size-5" />
 				</div>
 				<div>
 					<Card.Title>Game Icon</Card.Title>
@@ -94,10 +94,12 @@
 	</Card.Root>
 
 	<Card.Root class="thumb-card">
-		<Card.Header>
+		<Card.Header
+			class="flex flex-row items-start justify-between gap-4 max-sm:flex-col"
+		>
 			<div class="tds-inline-title">
 				<div class="tds-icon-well tds-icon-well--accent">
-					<Images />
+					<Images class="size-5" />
 				</div>
 				<div>
 					<Card.Title>Thumbnails</Card.Title>
@@ -147,19 +149,15 @@
 		display: grid;
 		grid-template-columns: minmax(16rem, 21rem) minmax(0, 1fr);
 		gap: 1rem;
-	}
 
-	:global(.icon-card [data-slot="card-header"]),
-	:global(.thumb-card [data-slot="card-header"]) {
-		display: flex;
-		align-items: flex-start;
-		justify-content: space-between;
-		gap: 1rem;
+		@media (width < 56.25rem) {
+			grid-template-columns: 1fr;
+		}
 	}
 
 	.count-pill {
 		padding: 0.45rem 0.7rem;
-		border-radius: 999px;
+		border-radius: 0.375rem;
 		background: var(--muted);
 		color: var(--muted-foreground);
 		font-size: 0.78rem;
@@ -183,12 +181,12 @@
 		&:hover:not(:disabled),
 		&:focus-visible:not(:disabled) {
 			transform: translateY(-2px);
-			border-color: color-mix(
-				in oklab,
-				var(--primary) 60%,
-				var(--border)
-			);
+			border-color: color-mix(in oklab, var(--primary) 60%, var(--border));
 			box-shadow: 0 18px 40px rgb(0 0 0 / 0.18);
+
+			.surface-overlay {
+				opacity: 1;
+			}
 		}
 
 		&:disabled {
@@ -201,6 +199,21 @@
 		aspect-ratio: 1;
 		max-width: 15rem;
 		justify-self: center;
+
+		img {
+			object-fit: contain;
+			background:
+				linear-gradient(
+					135deg,
+					color-mix(in oklab, var(--muted) 75%, transparent),
+					transparent
+				),
+				var(--card);
+		}
+
+		@media (width < 56.25rem) {
+			max-width: 100%;
+		}
 	}
 
 	.thumb-grid {
@@ -218,17 +231,6 @@
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
-	}
-
-	.icon-surface img {
-		object-fit: contain;
-		background:
-			linear-gradient(
-				135deg,
-				color-mix(in oklab, var(--muted) 75%, transparent),
-				transparent
-			),
-			var(--card);
 	}
 
 	.surface-overlay {
@@ -251,11 +253,6 @@
 		transition: opacity 0.2s ease;
 	}
 
-	.download-surface:hover:not(:disabled) .surface-overlay,
-	.download-surface:focus-visible:not(:disabled) .surface-overlay {
-		opacity: 1;
-	}
-
 	.asset-note {
 		display: flex;
 		align-items: flex-start;
@@ -264,25 +261,9 @@
 		font-size: 0.84rem;
 		line-height: 1.55;
 		color: var(--muted-foreground);
-	}
 
-	.placeholder-note {
-		padding-top: 0.25rem;
-	}
-
-	@media (max-width: 900px) {
-		.gallery-grid {
-			grid-template-columns: 1fr;
-		}
-
-		.icon-surface {
-			max-width: 100%;
-		}
-	}
-
-	@media (max-width: 640px) {
-		:global(.thumb-card [data-slot="card-header"]) {
-			flex-direction: column;
+		&.placeholder-note {
+			padding-top: 0.25rem;
 		}
 	}
 </style>

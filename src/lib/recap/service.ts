@@ -1,4 +1,4 @@
-import type { RecapData, DateInfo } from "../../types.js";
+import type { RecapData, DateInfo } from "../../types";
 
 export type WikiMode = "aew" | "tdsw";
 
