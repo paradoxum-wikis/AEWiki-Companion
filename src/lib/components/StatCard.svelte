@@ -25,7 +25,7 @@
 		display: flex;
 		align-items: center;
 		gap: 1rem;
-		padding: 1.25rem 1.5rem;
+		padding: 0.75rem 1rem;
 		border: 1px solid var(--border);
 		border-radius: 0.85rem;
 		background: var(--card);

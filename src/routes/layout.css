@@ -78,6 +78,8 @@
 		--chart-3: oklch(0.578 0.0292 35.72);
 		--chart-4: oklch(0.48 0.035 35.72);
 		--chart-5: oklch(0.38 0.04 35.72);
+		--color-conference-exo: #ab06fa;
+		--color-conference-twox: color-mix(in oklab, #f6f004, black 20%);
 	}
 	.dark {
 		--background: oklch(0.18 0.01 35.72);
@@ -104,6 +106,8 @@
 		--chart-3: oklch(0.578 0.0292 35.72);
 		--chart-4: oklch(0.48 0.035 35.72);
 		--chart-5: oklch(0.38 0.04 35.72);
+		--color-conference-exo: color-mix(in oklab, #ab06fa, white 25%);
+		--color-conference-twox: #f6f004;
 	}
 
 	* {

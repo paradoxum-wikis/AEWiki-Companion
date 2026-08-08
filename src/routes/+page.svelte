@@ -6,6 +6,7 @@
 		MessageCircle,
 		Gamepad2,
 		Wrench,
+		Swords,
 		ArrowRight,
 		ExternalLink,
 	} from "@lucide/svelte";
@@ -56,232 +57,251 @@
 </svelte:head>
 
 <PageShell>
-		<section class="hero">
-			<h1 class="hero-title">
-				<span class="hero-title-line1">Welcome,</span>
-				<span class="hero-title-line2">Alter Egoist</span>
-			</h1>
-			<p class="hero-sub">
-				To the companio! For the more quirky things of ALTER EGO Wiki
-				and Tower Defense Simulator Wiki!.<br />(/▿＼)
-			</p>
-		</section>
+	<section class="hero">
+		<h1 class="hero-title">
+			<span class="hero-title-line1">Welcome,</span>
+			<span class="hero-title-line2">Alter Egoist</span>
+		</h1>
+		<p class="hero-sub">
+			To the companio! For the more quirky things of ALTER EGO Wiki and
+			Tower Defense Simulator Wiki!.<br />(/▿＼)
+		</p>
+	</section>
 
-		<section class="cards-section">
-			<div class="section-label">Balderdash</div>
-			<div class="cards-grid">
-				<a
-					href="/recap/"
-					class="card card-featured card-recap"
-					aria-label="Weekly Recap"
-				>
-					<div class="card-accent-bar"></div>
-					<div class="card-icon-row">
-						<div class="card-icon"><Trophy class="size-5" /></div>
-					</div>
-					<div class="card-body">
-						<h2 class="card-title">Weekly Recap</h2>
-						<p class="card-desc">
-							Browse the contributor leaderboard and track who's
-							been building the ALTERPEDIA each week.
-						</p>
-					</div>
-					<div class="card-footer">
-						<span class="card-link"
-							>Browse Tool<ArrowRight class="size-3.5" /></span
-						>
-					</div>
-				</a>
-
-				<a
-					href="/deathbattle/"
-					class="card card-deathbattle"
-					aria-label="Deathbattle Statistics"
-				>
-					<div class="card-accent-bar"></div>
-					<div class="card-icon-row">
-						<div class="card-icon"><Zap class="size-5" /></div>
-					</div>
-					<div class="card-body">
-						<h2 class="card-title">Deathbattle Stats</h2>
-						<p class="card-desc">
-							Combat stats and rankings from the ALTERSHAPER
-							Discord bot.
-						</p>
-					</div>
-					<div class="card-footer">
-						<span class="card-link"
-							>Browse Tool<ArrowRight class="size-3.5" /></span
-						>
-					</div>
-				</a>
-
-				<a
-					href="/page-resources/"
-					class="card card-resources"
-					aria-label="Page Resources"
-				>
-					<div class="card-accent-bar"></div>
-					<div class="card-icon-row">
-						<div class="card-icon"><Wrench class="size-5" /></div>
-					</div>
-					<div class="card-body">
-						<h2 class="card-title">Page Resources</h2>
-						<p class="card-desc">
-							Access and download game assets, icons, and
-							thumbnails for wiki pages.
-						</p>
-					</div>
-					<div class="card-footer">
-						<span class="card-link"
-							>Browse Tool<ArrowRight class="size-3.5" /></span
-						>
-					</div>
-				</a>
-
-				<a
-					href="https://alter-ego.fandom.com/wiki/"
-					target="_blank"
-					rel="noopener noreferrer"
-					class="card card-wiki"
-					aria-label="ALTER EGO Wiki"
-				>
-					<div class="card-accent-bar"></div>
-					<div class="card-icon-row">
-						<div class="card-icon"><Book class="size-5" /></div>
-						<div class="card-badge">Fandom</div>
-					</div>
-					<div class="card-body">
-						<h2 class="card-title">ALTER EGO Wiki</h2>
-						<p class="card-desc">
-							Visit ALTER EGO Wiki and ALTERPEDIA!
-						</p>
-					</div>
-					<div class="card-footer">
-						<span class="card-link"
-							>Visit Wiki<ExternalLink class="size-3.5" /></span
-						>
-					</div>
-				</a>
-
-				<a
-					href="https://tds.fandom.com/wiki/"
-					target="_blank"
-					rel="noopener noreferrer"
-					class="card card-wiki"
-					aria-label="Tower Defense Simulator Wiki"
-				>
-					<div class="card-accent-bar"></div>
-					<div class="card-icon-row">
-						<div class="card-icon"><Book class="size-5" /></div>
-						<div class="card-badge">Fandom</div>
-					</div>
-					<div class="card-body">
-						<h2 class="card-title">Tower Defense Simulator</h2>
-						<p class="card-desc">
-							The official Tower Defense Simulator Wiki!
-						</p>
-					</div>
-					<div class="card-footer">
-						<span class="card-link"
-							>Visit Wiki<ExternalLink class="size-3.5" /></span
-						>
-					</div>
-				</a>
-
-				<a
-					href="https://x.com/isALTEREGOout"
-					target="_blank"
-					rel="noopener noreferrer"
-					class="card card-twitter"
-					aria-label="Fan Page on X"
-				>
-					<div class="card-accent-bar"></div>
-					<div class="card-icon-row">
-						<div class="card-icon">
-							<MessageCircle class="size-5" />
-						</div>
-						<div class="card-badge">X</div>
-					</div>
-					<div class="card-body">
-						<h2 class="card-title">Fan Page</h2>
-						<p class="card-desc">
-							Stay updated with the latest ALTER EGO news and
-							community discussions.
-						</p>
-					</div>
-					<div class="card-footer">
-						<span class="card-link"
-							>Follow Us<ExternalLink class="size-3.5" /></span
-						>
-					</div>
-				</a>
-
-				<a
-					href="https://aeb.tds-editor.com/"
-					target="_blank"
-					rel="noopener noreferrer"
-					class="card card-game"
-					aria-label="ALTER EGO: Before"
-				>
-					<div class="card-accent-bar"></div>
-					<div class="card-icon-row">
-						<div class="card-icon"><Gamepad2 class="size-5" /></div>
-					</div>
-					<div class="card-body">
-						<h2 class="card-title">ALTER EGO: Before</h2>
-						<p class="card-desc">
-							Play our first tech demo of the ALTER EGO (that is
-							mostly TDS...) fan game.
-						</p>
-					</div>
-					<div class="card-footer">
-						<span class="card-link"
-							>Play Demo<ExternalLink class="size-3.5" /></span
-						>
-					</div>
-				</a>
-			</div>
-		</section>
-
-		<section class="discord-section">
-			<div class="section-label">Community</div>
-			<div class="discord-layout">
-				<div class="discord-copy">
-					<h2 class="discord-heading">Enter the Asylum!</h2>
-					<p class="discord-sub">
-						Join us and many other Alter Egoists, in the most
-						delusional and unhinged yet also insightful and
-						informative, Discord server!
-					</p>
-					<ul class="discord-perks">
-						<li>What's in there, you may ask? Well, we got:</li>
-						<li>
-							<span class="perk-dot"></span> A welcoming community..!
-						</li>
-						<li>
-							<span class="perk-dot"></span> General tomfoolery...
-						</li>
-						<li>
-							<span class="perk-dot"></span> A lot of crackpot theories...
-						</li>
-						<li>
-							<span class="perk-dot"></span> Random people getting beaten
-							up...
-						</li>
-						<li>
-							<span class="perk-dot"></span> Ocassional philosophical
-							discussions!
-						</li>
-						<li>
-							<span class="perk-dot"></span> The most recent news for
-							ALTER EGO, of course!
-						</li>
-					</ul>
+	<section class="cards-section">
+		<div class="section-label">Balderdash</div>
+		<div class="cards-grid">
+			<a
+				href="/recap/"
+				class="card card-featured card-recap"
+				aria-label="Weekly Recap"
+			>
+				<div class="card-accent-bar"></div>
+				<div class="card-icon-row">
+					<div class="card-icon"><Trophy class="size-5" /></div>
 				</div>
-				<DiscordWidget />
+				<div class="card-body">
+					<h2 class="card-title">Weekly Recap</h2>
+					<p class="card-desc">
+						Browse the contributor leaderboard and track who's been
+						building the ALTERPEDIA each week.
+					</p>
+				</div>
+				<div class="card-footer">
+					<span class="card-link"
+						>Browse Tool<ArrowRight class="size-3.5" /></span
+					>
+				</div>
+			</a>
+
+			<a
+				href="/deathbattle/"
+				class="card card-deathbattle"
+				aria-label="Deathbattle Statistics"
+			>
+				<div class="card-accent-bar"></div>
+				<div class="card-icon-row">
+					<div class="card-icon"><Zap class="size-5" /></div>
+				</div>
+				<div class="card-body">
+					<h2 class="card-title">Deathbattle Stats</h2>
+					<p class="card-desc">
+						Combat stats and rankings from the ALTERSHAPER Discord
+						bot.
+					</p>
+				</div>
+				<div class="card-footer">
+					<span class="card-link"
+						>Browse Tool<ArrowRight class="size-3.5" /></span
+					>
+				</div>
+			</a>
+
+			<a
+				href="/tournaments/"
+				class="card card-tournaments"
+				aria-label="Tournament Recap"
+			>
+				<div class="card-accent-bar"></div>
+				<div class="card-icon-row">
+					<div class="card-icon"><Swords class="size-5" /></div>
+				</div>
+				<div class="card-body">
+					<h2 class="card-title">Tournament Recap</h2>
+					<p class="card-desc">Recap of the 2026 Aphonos Playoffs.</p>
+				</div>
+				<div class="card-footer">
+					<span class="card-link"
+						>View Recap<ArrowRight class="size-3.5" /></span
+					>
+				</div>
+			</a>
+
+			<a
+				href="/page-resources/"
+				class="card card-resources"
+				aria-label="Page Resources"
+			>
+				<div class="card-accent-bar"></div>
+				<div class="card-icon-row">
+					<div class="card-icon"><Wrench class="size-5" /></div>
+				</div>
+				<div class="card-body">
+					<h2 class="card-title">Page Resources</h2>
+					<p class="card-desc">
+						Access and download game assets, icons, and thumbnails
+						for wiki pages.
+					</p>
+				</div>
+				<div class="card-footer">
+					<span class="card-link"
+						>Browse Tool<ArrowRight class="size-3.5" /></span
+					>
+				</div>
+			</a>
+
+			<a
+				href="https://alter-ego.fandom.com/wiki/"
+				target="_blank"
+				rel="noopener noreferrer"
+				class="card card-wiki"
+				aria-label="ALTER EGO Wiki"
+			>
+				<div class="card-accent-bar"></div>
+				<div class="card-icon-row">
+					<div class="card-icon"><Book class="size-5" /></div>
+					<div class="card-badge">Fandom</div>
+				</div>
+				<div class="card-body">
+					<h2 class="card-title">ALTER EGO Wiki</h2>
+					<p class="card-desc">
+						Visit ALTER EGO Wiki and ALTERPEDIA!
+					</p>
+				</div>
+				<div class="card-footer">
+					<span class="card-link"
+						>Visit Wiki<ExternalLink class="size-3.5" /></span
+					>
+				</div>
+			</a>
+
+			<a
+				href="https://tds.fandom.com/wiki/"
+				target="_blank"
+				rel="noopener noreferrer"
+				class="card card-wiki"
+				aria-label="Tower Defense Simulator Wiki"
+			>
+				<div class="card-accent-bar"></div>
+				<div class="card-icon-row">
+					<div class="card-icon"><Book class="size-5" /></div>
+					<div class="card-badge">Fandom</div>
+				</div>
+				<div class="card-body">
+					<h2 class="card-title">Tower Defense Simulator</h2>
+					<p class="card-desc">
+						The official Tower Defense Simulator Wiki!
+					</p>
+				</div>
+				<div class="card-footer">
+					<span class="card-link"
+						>Visit Wiki<ExternalLink class="size-3.5" /></span
+					>
+				</div>
+			</a>
+
+			<a
+				href="https://x.com/isALTEREGOout"
+				target="_blank"
+				rel="noopener noreferrer"
+				class="card card-twitter"
+				aria-label="Fan Page on X"
+			>
+				<div class="card-accent-bar"></div>
+				<div class="card-icon-row">
+					<div class="card-icon">
+						<MessageCircle class="size-5" />
+					</div>
+					<div class="card-badge">X</div>
+				</div>
+				<div class="card-body">
+					<h2 class="card-title">Fan Page</h2>
+					<p class="card-desc">
+						Stay updated with the latest ALTER EGO news and
+						community discussions.
+					</p>
+				</div>
+				<div class="card-footer">
+					<span class="card-link"
+						>Follow Us<ExternalLink class="size-3.5" /></span
+					>
+				</div>
+			</a>
+
+			<a
+				href="https://aeb.tds-editor.com/"
+				target="_blank"
+				rel="noopener noreferrer"
+				class="card card-game"
+				aria-label="ALTER EGO: Before"
+			>
+				<div class="card-accent-bar"></div>
+				<div class="card-icon-row">
+					<div class="card-icon"><Gamepad2 class="size-5" /></div>
+				</div>
+				<div class="card-body">
+					<h2 class="card-title">ALTER EGO: Before</h2>
+					<p class="card-desc">
+						Play our first tech demo of the ALTER EGO (that is
+						mostly TDS...) fan game.
+					</p>
+				</div>
+				<div class="card-footer">
+					<span class="card-link"
+						>Play Demo<ExternalLink class="size-3.5" /></span
+					>
+				</div>
+			</a>
+		</div>
+	</section>
+
+	<section class="discord-section">
+		<div class="section-label">Community</div>
+		<div class="discord-layout">
+			<div class="discord-copy">
+				<h2 class="discord-heading">Enter the Asylum!</h2>
+				<p class="discord-sub">
+					Join us and many other Alter Egoists, in the most delusional
+					and unhinged yet also insightful and informative, Discord
+					server!
+				</p>
+				<ul class="discord-perks">
+					<li>What's in there, you may ask? Well, we got:</li>
+					<li>
+						<span class="perk-dot"></span> A welcoming community..!
+					</li>
+					<li>
+						<span class="perk-dot"></span> General tomfoolery...
+					</li>
+					<li>
+						<span class="perk-dot"></span> A lot of crackpot theories...
+					</li>
+					<li>
+						<span class="perk-dot"></span> Random people getting beaten
+						up...
+					</li>
+					<li>
+						<span class="perk-dot"></span> Ocassional philosophical discussions!
+					</li>
+					<li>
+						<span class="perk-dot"></span> The most recent news for ALTER
+						EGO, of course!
+					</li>
+				</ul>
 			</div>
-		</section>
+			<DiscordWidget />
+		</div>
+	</section>
 </PageShell>
 
 <style>
@@ -423,12 +443,7 @@
 		}
 
 		&.card-game {
-			grid-column: span 2;
 			--card-accent: oklch(0.55 0.15 300);
-
-			@media (width < 37.5rem) {
-				grid-column: span 1;
-			}
 		}
 
 		&.card-recap {
@@ -441,6 +456,10 @@
 
 		&.card-resources {
 			--card-accent: oklch(0.5 0.1 220);
+		}
+
+		&.card-tournaments {
+			--card-accent: oklch(0.55 0.15 300);
 		}
 
 		&.card-wiki {

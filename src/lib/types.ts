@@ -57,3 +57,101 @@ export interface BattleRecord {
 	isRanked: boolean;
 	guildId?: string;
 }
+
+export interface TourneyCombatant {
+	userId: string;
+	tag: string;
+	displayName: string;
+}
+
+export interface TourneyGame {
+	gameIndex: number;
+	winnerId: string;
+	loserId: string;
+	turns: number;
+	scores: Record<string, TourneyScore>;
+	playedAt: string;
+}
+
+export interface TourneyScore {
+	damageDealt: number;
+	hpRemaining: number;
+	maxHp: number;
+}
+
+export interface TourneyBet {
+	userId: string;
+	pickId: string;
+}
+
+export interface TourneyRef {
+	userId: string;
+	tag: string;
+	displayName: string;
+}
+
+export interface TourneyRefPick {
+	userId: string;
+	refIndex: number;
+	subgroup: number;
+	arcana: string;
+}
+
+export interface TourneySeries {
+	id: string;
+	round: string;
+	subgroup?: number;
+	conference?: "exo" | "two_x";
+	slotA?: number;
+	slotB?: number;
+	feedsFrom?: string[];
+	fighterAId: string | null;
+	fighterBId: string | null;
+	winsNeeded: number;
+	wins: Record<string, number>;
+	games: TourneyGame[];
+	bets: TourneyBet[];
+	status: "ready" | "in_progress" | "complete" | "pending";
+	refIds: string[];
+	betsClosedAt?: string;
+	winnerId?: string | null;
+}
+
+export interface TourneyAwards {
+	tournamentChampion: string;
+	exoChampion: string;
+	twoXChampion: string;
+	manOfTheTournament: string;
+	refOfTheTournament: string;
+	gamblingAddict: string;
+}
+
+export interface TourneyLogEntry {
+	at: string;
+	kind: string;
+	detail?: Record<string, unknown>;
+}
+
+export interface TournamentData {
+	id: string;
+	guildId: string;
+	createdAt: string;
+	updatedAt: string;
+	phase: "active" | "complete" | "aborted";
+	combatants: TourneyCombatant[];
+	referees: TourneyRef[];
+	refPicks: TourneyRefPick[];
+	slots: string[];
+	series: TourneySeries[];
+	motScores: Record<string, number>;
+	betPoints: Record<string, number>;
+	refGamesOfficiated: Record<string, number>;
+	log: TourneyLogEntry[];
+	currentSeriesId?: string;
+}
+
+export interface TourneyLog {
+	version: number;
+	active: Record<string, unknown>;
+	history: TournamentData[];
+}
