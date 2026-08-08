@@ -10,6 +10,7 @@
 	import TournamentBracket from "$lib/components/tournament/TournamentBracket.svelte";
 	import StandingsPanel from "$lib/components/tournament/StandingsPanel.svelte";
 	import RefereePanel from "$lib/components/tournament/RefereePanel.svelte";
+	import PopularityPanel from "$lib/components/tournament/PopularityPanel.svelte";
 
 	let recap = $state<TournamentRecap | null>(null);
 	let loading = $state(true);
@@ -88,6 +89,13 @@
 		<RefereePanel
 			refStandings={recap.refStandings}
 			betStandings={recap.betStandings}
+			{loading}
+		/>
+
+		<div class="h-px bg-border my-8"></div>
+
+		<PopularityPanel
+			popularityStandings={recap.popularityStandings}
 			{loading}
 		/>
 	{/if}

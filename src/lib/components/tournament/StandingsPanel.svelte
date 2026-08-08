@@ -23,7 +23,7 @@
 <div class="tab-panel">
 	<Card.Root>
 		<Card.Header>
-			<Card.Title>Man of the Tournament Standings</Card.Title>
+			<Card.Title>Man of the Tournament</Card.Title>
 		</Card.Header>
 		<Card.Content class="p-0">
 			{#if loading}

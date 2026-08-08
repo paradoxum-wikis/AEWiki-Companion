@@ -98,6 +98,14 @@ export interface BetStanding {
 	points: number;
 }
 
+export interface PopularityStanding {
+	userId: string;
+	name: string;
+	tag: string;
+	avgPickShare: number;
+	seriesPlayed: number;
+}
+
 export interface ChampionsInfo {
 	tournamentChampion: string;
 	exoChampion: string;
@@ -125,6 +133,7 @@ export interface TournamentRecap {
 	standings: PlayerStanding[];
 	refStandings: RefStanding[];
 	betStandings: BetStanding[];
+	popularityStandings: PopularityStanding[];
 	totalSeries: number;
 	totalGames: number;
 	totalDamage: number;
@@ -568,6 +577,40 @@ export class TournamentService {
 			}))
 			.sort((a, b) => b.points - a.points);
 
+		const popAcc = new Map<string, { userId: string; share: number; series: number; name: string; tag: string }>();
+		for (const s of tourney.series || []) {
+			const bets = s.bets || [];
+			if (bets.length === 0) continue;
+			const picksBy = new Map<string, number>();
+			for (const b of bets) {
+				picksBy.set(b.pickId, (picksBy.get(b.pickId) ?? 0) + 1);
+			}
+			for (const uid of [s.fighterAId, s.fighterBId]) {
+				if (!uid) continue;
+				const row = popAcc.get(uid) ?? {
+					userId: uid,
+					share: 0,
+					series: 0,
+					name: nameOf(uid) ?? uid,
+					tag: tagOf(uid) ?? "",
+				};
+				row.share += (picksBy.get(uid) ?? 0) / bets.length;
+				row.series++;
+				popAcc.set(uid, row);
+			}
+		}
+		const popularityStandings: PopularityStanding[] = Array.from(
+			popAcc.values(),
+		)
+			.map(({ userId, share, series, name, tag }) => ({
+				userId,
+				name,
+				tag,
+				avgPickShare: series > 0 ? share / series : 0,
+				seriesPlayed: series,
+			}))
+			.sort((a, b) => b.avgPickShare - a.avgPickShare || b.seriesPlayed - a.seriesPlayed);
+
 		const finalMatch = bracketByRound.final?.[0] ?? null;
 		const championId = champions.tournamentChampion;
 		const champion = championId
@@ -590,6 +633,7 @@ export class TournamentService {
 			standings,
 			refStandings,
 			betStandings,
+			popularityStandings,
 			totalSeries: tourney.series?.length || 0,
 			totalGames,
 			totalDamage,
