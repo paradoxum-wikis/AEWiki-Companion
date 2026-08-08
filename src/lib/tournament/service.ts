@@ -24,6 +24,7 @@ export interface TournamentMatch {
 	winsNeeded: number;
 	gameCount: number;
 	refCards: MatchRefCard[];
+	bets: MatchBet[];
 	roundArcanas: string[];
 	details: MatchGameDetail[];
 }
@@ -32,6 +33,13 @@ export interface MatchRefCard {
 	arcana: string;
 	level: number;
 	name: string | null;
+}
+
+export interface MatchBet {
+	userId: string;
+	pickId: string;
+	name: string;
+	tag: string;
 }
 
 export interface MatchGameDetail {
@@ -425,6 +433,12 @@ export class TournamentService {
 								name: refNameOf(id),
 							})),
 				roundArcanas: activeRoundArcanas(s.round),
+				bets: (s.bets || []).map((b) => ({
+					userId: b.userId,
+					pickId: b.pickId,
+					name: nameOf(b.userId) ?? refNameOf(b.userId),
+					tag: tagOf(b.userId) ?? "",
+				})),
 				details: (s.games || []).map((g) => {
 					const scores = g.scores || {};
 					const a = s.fighterAId ? scores[s.fighterAId] : undefined;

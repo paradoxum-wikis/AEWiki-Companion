@@ -232,10 +232,10 @@
 													</div>
 												</div>
 											{/each}
-											{#if match.refCards.length > 0 || match.roundArcanas.length > 0}
+											{#if match.refCards.length > 0 || match.roundArcanas.length > 0 || match.bets.length > 0}
 												<div class="detail-meta">
 													<span class="meta-label"
-														>Round</span
+														>Round Arcanas</span
 													>
 													{#each match.roundArcanas as id (id)}
 														<div class="meta-value">
@@ -271,7 +271,7 @@
 														</div>
 													{/each}
 													<span class="meta-label referee-label"
-														>Referee</span
+														>Referee Arcanas</span
 													>
 													{#each match.refCards.filter((c) => c.name) as card (card.arcana)}
 														<div class="meta-value">
@@ -293,6 +293,31 @@
 															>
 														</div>
 													{/each}
+													{#if match.bets.length > 0}
+														<span class="meta-label referee-label"
+															>Bets</span
+														>
+														<span class="bet-pick"
+															>{match.aName}</span
+														>
+														<span class="bet-users">
+															{#each match.bets.filter((b) => b.pickId === match.aId) as bet (bet.userId)}
+																<span class="bet-user"
+																	>{bet.name}</span
+																>
+															{/each}
+														</span>
+														<span class="bet-pick"
+															>{match.bName}</span
+														>
+														<span class="bet-users">
+															{#each match.bets.filter((b) => b.pickId === match.bId) as bet (bet.userId)}
+																<span class="bet-user"
+																	>{bet.name}</span
+																>
+															{/each}
+														</span>
+													{/if}
 												</div>
 											{/if}
 										{/if}
@@ -660,6 +685,30 @@
 		overflow: hidden;
 		text-overflow: ellipsis;
 		color: var(--foreground);
+		font-weight: 600;
+	}
+
+	.bet-pick {
+		display: flex;
+		align-items: center;
+		font-size: 0.68rem;
+		font-weight: 700;
+		color: var(--foreground);
+		margin-top: 0.3rem;
+	}
+
+	.bet-users {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.25rem;
+	}
+
+	.bet-user {
+		padding: 0.1rem 0.45rem;
+		border-radius: 999px;
+		background: var(--muted);
+		color: var(--muted-foreground);
+		font-size: 0.62rem;
 		font-weight: 600;
 	}
 
