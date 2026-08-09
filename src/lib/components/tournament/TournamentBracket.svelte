@@ -168,15 +168,8 @@
 																<span
 																	class="stat"
 																	>{g.aDmg.toLocaleString()}
-																	dmg</span
-																>
-																<span
-																	class="sep"
-																	>·</span
-																>
-																<span
-																	class="stat"
-																	>HP {g.aHp}/{g.aMaxHp}</span
+																	dmg · HP {g.aHp}/
+																	{g.aMaxHp}</span
 																>
 															</span>
 														</span>
@@ -196,15 +189,8 @@
 																<span
 																	class="stat"
 																	>{g.bDmg.toLocaleString()}
-																	dmg</span
-																>
-																<span
-																	class="sep"
-																	>·</span
-																>
-																<span
-																	class="stat"
-																	>HP {g.bHp}/{g.bMaxHp}</span
+																	dmg · HP {g.bHp}/
+																	{g.bMaxHp}</span
 																>
 															</span>
 														</span>
@@ -216,19 +202,16 @@
 														<span
 															>{g.turns === 1
 																? " turn"
-																: " turns"}</span
-														>
-														{#if g.playedAt}
-															<span class="sep"
-																>·</span
+																: " turns"}{#if g.playedAt}{" · "}{/if}</span
 															>
-															<span
-																class="played-at"
-																>{formatTime(
-																	g.playedAt,
-																)}</span
-															>
-														{/if}
+															{#if g.playedAt}
+																<span
+																	class="played-at"
+																	>{formatTime(
+																		g.playedAt,
+																	)}</span
+																>
+															{/if}
 													</div>
 												</div>
 											{/each}
@@ -594,10 +577,6 @@
 	}
 
 	.game-stats {
-		display: flex;
-		align-items: center;
-		flex-wrap: wrap;
-		gap: 0.1rem 0.5rem;
 		margin-top: 0.15rem;
 		font-size: 0.65rem;
 		font-weight: 500;
@@ -610,11 +589,6 @@
 		background: color-mix(in oklab, var(--primary) 12%, transparent);
 		color: var(--primary);
 		font-weight: 700;
-	}
-
-	.sep {
-		color: var(--muted-foreground);
-		opacity: 0.6;
 	}
 
 	.turns {

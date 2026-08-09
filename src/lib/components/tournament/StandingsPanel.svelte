@@ -78,11 +78,7 @@
 								<div class="damage">
 									<span
 										>{p.damageDealt.toLocaleString()}
-										dmg</span
-									>
-									<span class="sep">·</span>
-									<span
-										>{p.hpLeftTotal.toLocaleString()}
+										dmg · {p.hpLeftTotal.toLocaleString()}
 										hp</span
 									>
 								</div>
@@ -210,15 +206,9 @@
 
 	.damage {
 		display: flex;
-		align-items: baseline;
 		justify-content: flex-end;
-		gap: 0.35rem;
 		font-size: 0.75rem;
 		color: var(--muted-foreground);
-	}
-
-	.damage .sep {
-		opacity: 0.5;
 	}
 
 	.mot-points {
